@@ -68,6 +68,27 @@ class GroupStore(context: Context) {
         return added
     }
 
+    // ---------- المشاهدات الأخيرة ----------
+
+    fun recents(type: ContentType): MutableList<String> {
+        val json = sp.getString("r_${type.name}", null) ?: return mutableListOf()
+        return runCatching { gson.fromJson<MutableList<String>>(json, stringListType) }
+            .getOrNull() ?: mutableListOf()
+    }
+
+    /** يضيف العنصر في أول القائمة (آخر 50 عنصر فقط). */
+    fun addRecent(type: ContentType, key: String) {
+        val list = recents(type)
+        list.remove(key)
+        list.add(0, key)
+        while (list.size > 50) list.removeAt(list.size - 1)
+        sp.edit().putString("r_${type.name}", gson.toJson(list)).apply()
+    }
+
+    fun clearRecents(type: ContentType) {
+        sp.edit().remove("r_${type.name}").apply()
+    }
+
     // ---------- المفضلة ----------
 
     fun favorites(type: ContentType): MutableList<String> {

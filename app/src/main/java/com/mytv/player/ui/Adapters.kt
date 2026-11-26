@@ -76,7 +76,7 @@ object Images {
 
 /** صف في قائمة التصنيفات الجانبية. */
 data class CategoryRow(val kind: Kind, val id: String, val name: String, val count: Int) {
-    enum class Kind { ALL, FAVORITES, GROUP, ADD_GROUP, SERVER }
+    enum class Kind { RECENT, ALL, FAVORITES, GROUP, ADD_GROUP, SERVER }
     val key: String get() = "${kind.name}:$id"
 }
 
@@ -128,6 +128,7 @@ class CategoryAdapter(
         val r = rows[position]
         val ctx = h.itemView.context
         h.name.text = when (r.kind) {
+            CategoryRow.Kind.RECENT -> "↺  ${r.name}"
             CategoryRow.Kind.FAVORITES -> "★  ${r.name}"
             CategoryRow.Kind.GROUP -> "▣  ${r.name}"
             CategoryRow.Kind.ADD_GROUP -> "＋  ${r.name}"

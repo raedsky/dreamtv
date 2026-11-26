@@ -84,4 +84,11 @@
     <string name="same_image_count">عدد العناصر التي تستخدم نفس رابط الصورة: %1$d</string>
     <string name="copy">نسخ</string>
     <string name="copied">تم النسخ</string>
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_live">مباشر</string>
+    <string name="tab_movies">أفلام</string>
+    <string name="tab_series">مسلسل</string>
+    <string name="recent">المشاهدات الأخيرة</string>
+    <string name="clear_recent">مسح المشاهدات الأخيرة</string>
+    <string name="empty_recent">لم تشاهد شيئاً بعد</string>
 </resources>

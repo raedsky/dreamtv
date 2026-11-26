@@ -84,4 +84,11 @@
     <string name="same_image_count">Items using this same image link: %1$d</string>
     <string name="copy">Copy</string>
     <string name="copied">Copied</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_live">Live</string>
+    <string name="tab_movies">Movies</string>
+    <string name="tab_series">Series</string>
+    <string name="recent">Recently watched</string>
+    <string name="clear_recent">Clear recently watched</string>
+    <string name="empty_recent">Nothing watched yet</string>
 </resources>

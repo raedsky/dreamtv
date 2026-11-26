@@ -106,6 +106,7 @@ class BrowseActivity : AppCompatActivity() {
         etSearch.doAfterTextChanged { applyFilter() }
 
         if (type == ContentType.LIVE) setupPreview()
+        setupTopBar()
 
         load(force = false)
     }
@@ -152,6 +153,8 @@ class BrowseActivity : AppCompatActivity() {
         val counts = c.items.groupingBy { it.categoryId }.eachCount()
 
         val rows = ArrayList<CategoryRow>()
+        rows += CategoryRow(Kind.RECENT, "recent", getString(R.string.recent),
+            app.groups.recents(type).count { it in index })
         rows += CategoryRow(Kind.ALL, "all", getString(R.string.all), c.items.size)
         rows += CategoryRow(Kind.FAVORITES, "fav", getString(R.string.favorites), favs.count { it in index })
         for (g in app.groups.groups(type)) {
@@ -163,7 +166,8 @@ class BrowseActivity : AppCompatActivity() {
         }
         catAdapter.submit(rows)
 
-        val sel = current?.let { cur -> rows.firstOrNull { it.key == cur.key } } ?: rows.first()
+        val sel = current?.let { cur -> rows.firstOrNull { it.key == cur.key } }
+            ?: rows.first { it.kind == Kind.ALL }
         val changed = sel.key != current?.key
         current = sel
         catAdapter.setSelected(sel)
@@ -179,6 +183,7 @@ class BrowseActivity : AppCompatActivity() {
     private fun itemsFor(row: CategoryRow): List<StreamItem> {
         val c = content ?: return emptyList()
         return when (row.kind) {
+            Kind.RECENT -> app.groups.recents(type).mapNotNull { index[it] }
             Kind.ALL -> c.items
             Kind.FAVORITES -> app.groups.favorites(type).mapNotNull { index[it] }
             Kind.GROUP -> (app.groups.groups(type).find { it.id == row.id }?.items ?: emptyList())
@@ -193,7 +198,7 @@ class BrowseActivity : AppCompatActivity() {
         var list = if (q.isEmpty()) currentItems
                    else currentItems.filter { it.name.contains(q, ignoreCase = true) }
         // القروبات والمفضلة تبقى بترتيب المستخدم
-        if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES) {
+        if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES && current?.kind != Kind.RECENT) {
             list = when (app.prefs.sortMode) {
                 "added" -> list.sortedByDescending { it.added }
                 "name" -> list.sortedBy { it.name.lowercase() }
@@ -205,11 +210,38 @@ class BrowseActivity : AppCompatActivity() {
         rvItems.scrollToPosition(0)
         val emptyMsg = when {
             list.isNotEmpty() -> null
+            current?.kind == Kind.RECENT -> getString(R.string.empty_recent)
             current?.kind == Kind.GROUP || current?.kind == Kind.FAVORITES -> getString(R.string.empty_group)
             else -> getString(R.string.empty_list)
         }
         tvEmpty.text = emptyMsg
         tvEmpty.isVisible = emptyMsg != null
+    }
+
+    // ---------------- الشريط العلوي ----------------
+
+    private fun setupTopBar() {
+        val tabs = mapOf(
+            R.id.tabLive to ContentType.LIVE,
+            R.id.tabMovies to ContentType.MOVIE,
+            R.id.tabSeries to ContentType.SERIES
+        )
+        findViewById<View>(R.id.tabHome).setOnClickListener { finish() }
+        for ((id, t) in tabs) {
+            val tab = findViewById<TextView>(id)
+            if (t == type) {
+                tab.isSelected = true
+                tab.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.accent))
+            }
+            tab.setOnClickListener {
+                if (t != type) {
+                    start(this, t)
+                    finish()
+                    @Suppress("DEPRECATION")
+                    overridePendingTransition(0, 0)
+                }
+            }
+        }
     }
 
     // ---------------- الترتيب ----------------
@@ -259,6 +291,12 @@ class BrowseActivity : AppCompatActivity() {
 
     private fun onCategoryLongClick(row: CategoryRow) {
         when (row.kind) {
+            Kind.RECENT -> AlertDialog.Builder(this)
+                .setItems(arrayOf(getString(R.string.clear_recent))) { _, _ ->
+                    app.groups.clearRecents(type)
+                    refresh(reloadItems = current?.kind == Kind.RECENT)
+                }
+                .show()
             Kind.GROUP -> groupOptions(row)
             Kind.SERVER -> {
                 // إضافة كل عناصر التصنيف إلى قروب خاص دفعة واحدة
@@ -430,6 +468,7 @@ class BrowseActivity : AppCompatActivity() {
     // ---------------- التشغيل ----------------
 
     private fun openItem(item: StreamItem, position: Int) {
+        app.groups.addRecent(type, item.key)
         if (item.type == ContentType.SERIES && item.url == null) {
             SeriesDetailActivity.open(this, item)
             return
@@ -494,6 +533,8 @@ class BrowseActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        // تحديث عدّاد "المشاهدات الأخيرة" بعد الرجوع من التشغيل
+        if (content != null) refresh(reloadItems = current?.kind == Kind.RECENT)
         // الرجوع من ملء الشاشة: نكمل المعاينة على نفس القناة
         if (type == ContentType.LIVE) previewItem?.let { startPreview(it) }
     }
