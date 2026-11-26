@@ -53,4 +53,7 @@
     <string name="expiry">Expires: %1$s</string>
     <string name="unlimited">Unlimited</string>
     <string name="preview_hint">Press OK on a channel to preview it.\nPress OK again for full screen.</string>
+    <string name="back">Back</string>
+    <string name="prev_channel">Previous channel</string>
+    <string name="next_channel">Next channel</string>
 </resources>

@@ -53,4 +53,7 @@
     <string name="expiry">ينتهي: %1$s</string>
     <string name="unlimited">غير محدود</string>
     <string name="preview_hint">اضغط OK على القناة لمعاينتها.\nاضغط OK مرة ثانية لملء الشاشة.</string>
+    <string name="back">رجوع</string>
+    <string name="prev_channel">القناة السابقة</string>
+    <string name="next_channel">القناة التالية</string>
 </resources>

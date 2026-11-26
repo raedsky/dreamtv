@@ -3,7 +3,11 @@ package com.mytv.player.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.content.pm.PackageManager
+import android.view.GestureDetector
 import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.OptIn
@@ -76,6 +80,10 @@ class PlayerActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
     private lateinit var playerView: PlayerView
     private lateinit var tvTitle: TextView
+    private lateinit var btnBack: View
+    private lateinit var zapButtons: View
+    private lateinit var gestures: GestureDetector
+    private var hasTouch = false
     private val hideTitle = Runnable { tvTitle.isVisible = false }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +94,36 @@ class PlayerActivity : AppCompatActivity() {
         tvTitle = findViewById(R.id.tvTitle)
         playerView.keepScreenOn = true
         if (PlayQueue.live) playerView.controllerAutoShow = false
+        hasTouch = packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)
+
+        // أزرار اللمس: رجوع + تغيير القناة
+        btnBack = findViewById(R.id.btnBack)
+        zapButtons = findViewById(R.id.zapButtons)
+        btnBack.setOnClickListener { finish() }
+        findViewById<View>(R.id.btnChUp).setOnClickListener { zap(-1) }
+        findViewById<View>(R.id.btnChDown).setOnClickListener { zap(1) }
+        if (!hasTouch) {
+            // في الشاشات والبوكسات لا نخلي الأزرار تسرق تركيز الريموت
+            for (id in intArrayOf(R.id.btnBack, R.id.btnChUp, R.id.btnChDown)) findViewById<View>(id).isFocusable = false
+        }
+        playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+            setOverlayVisible(visibility == View.VISIBLE)
+        })
+        setOverlayVisible(false)
+
+        // السحب لأعلى/لأسفل على الشاشة يغيّر القناة
+        gestures = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, vx: Float, vy: Float): Boolean {
+                if (!PlayQueue.live || e1 == null) return false
+                val dy = e2.y - e1.y
+                val dx = e2.x - e1.x
+                if (Math.abs(dy) > 120 && Math.abs(dy) > Math.abs(dx) * 1.5f) {
+                    zap(if (dy < 0) 1 else -1)
+                    return true
+                }
+                return false
+            }
+        })
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, playerView).apply {
@@ -119,6 +157,18 @@ class PlayerActivity : AppCompatActivity() {
         playerView.player = p
         player = p
         playCurrent()
+        // على التابلت والجوال: نُظهر الأزرار في البداية حتى يعرف المستخدم مكانها
+        if (hasTouch) playerView.showController()
+    }
+
+    private fun setOverlayVisible(visible: Boolean) {
+        btnBack.isVisible = visible
+        zapButtons.isVisible = visible && PlayQueue.live && PlayQueue.entries.size > 1
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (::gestures.isInitialized && gestures.onTouchEvent(ev)) return true
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun playCurrent() {
