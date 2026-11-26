@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
  * الموقع التقريبي من عنوان الإنترنت (ipwho.is) والطقس من open-meteo.com — كلاهما مجاني وبدون مفتاح.
  */
 object Weather {
-    data class Info(val place: String, val tempC: Int?)
+    data class Info(val place: String, val tempC: Int?, val code: Int? = null)
 
     private var cached: Info? = null
     private var cachedAt = 0L
@@ -28,13 +28,16 @@ object Weather {
             val country = geo.str("country")
             val lat = geo.str("latitude")
             val lon = geo.str("longitude")
+            var code: Int? = null
             val temp = if (lat != null && lon != null) runCatching {
                 val w = JsonParser.parseString(
-                    fetch("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m")
+                    fetch("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,weather_code")
                 ).asJsonObject
-                w.getAsJsonObject("current").get("temperature_2m").asDouble.roundToInt()
+                val cur = w.getAsJsonObject("current")
+                code = runCatching { cur.get("weather_code").asInt }.getOrNull()
+                cur.get("temperature_2m").asDouble.roundToInt()
             }.getOrNull() else null
-            Info(listOfNotNull(city, country).joinToString("، "), temp)
+            Info(city ?: country ?: "", temp, code)
         }.getOrNull()
         if (info != null) { cached = info; cachedAt = now }
         info

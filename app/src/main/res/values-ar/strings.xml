@@ -91,4 +91,8 @@
     <string name="recent">المشاهدات الأخيرة</string>
     <string name="clear_recent">مسح المشاهدات الأخيرة</string>
     <string name="empty_recent">لم تشاهد شيئاً بعد</string>
+    <string name="live_sub">شاهد القنوات المباشرة</string>
+    <string name="movies_sub">تصفّح كل الأفلام</string>
+    <string name="series_sub">تصفّح كل المسلسلات</string>
+    <string name="today">اليوم</string>
 </resources>

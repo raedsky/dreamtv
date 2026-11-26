@@ -107,4 +107,61 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">17sp</item>
     </style>
+
+    <!-- الشاشة الرئيسية الزجاجية -->
+    <style name="GlassCard">
+        <item name="android:layout_margin">9dp</item>
+        <item name="android:background">@drawable/bg_glass</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+    <style name="GlassIcon">
+        <item name="android:tint">#FF8F7BFF</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="GlassTexts">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">18dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="GlassTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="GlassSub">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColor">#B3FFFFFF</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+    <style name="GlassSmall" parent="GlassCard">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">8dp</item>
+    </style>
+    <style name="GlassSmallIcon">
+        <item name="android:layout_width">46dp</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:tint">#FF8F7BFF</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="GlassSmallText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

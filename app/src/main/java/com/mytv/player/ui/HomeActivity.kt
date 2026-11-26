@@ -48,6 +48,9 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         tileLive.requestFocus()
+        // في نظام 24 ساعة نخفي ص/م
+        findViewById<View>(R.id.tvAmPm).visibility =
+            if (android.text.format.DateFormat.is24HourFormat(this)) View.GONE else View.VISIBLE
     }
 
     override fun onResume() {
@@ -71,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
         val tvExpiry = findViewById<TextView>(R.id.tvExpiry)
         if (p == null) {
             tvAccount.setText(R.string.no_playlist)
-            tvExpiry.text = ""
+            tvExpiry.text = getString(R.string.expiry, "—")
             return
         }
         val user = if (p.kind == Profile.XTREAM) "  •  ${p.username}" else ""
@@ -81,17 +84,24 @@ class HomeActivity : AppCompatActivity() {
             val text = if (exp != null) DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))
                        else getString(R.string.unlimited)
             getString(R.string.expiry, text)
-        } else ""
+        } else getString(R.string.expiry, "—")
     }
 
     private fun loadWeather() {
-        val tv = findViewById<TextView>(R.id.tvWeather)
+        val tvPlace = findViewById<TextView>(R.id.tvWeather)
+        val tvTemp = findViewById<TextView>(R.id.tvTemp)
+        val icon = findViewById<android.widget.ImageView>(R.id.ivWeather)
         lifecycleScope.launch {
             val w = Weather.get() ?: return@launch
-            tv.text = listOfNotNull(
-                w.place.takeIf { it.isNotBlank() },
-                w.tempC?.let { "$it°C" }
-            ).joinToString("  •  ")
+            tvPlace.text = w.place
+            tvTemp.text = w.tempC?.let { "$it°C" } ?: ""
+            // رموز WMO: 0-1 صحو، 2-48 غيوم/ضباب، 51+ مطر/ثلج/عواصف
+            val c = w.code ?: 0
+            icon.setImageResource(when {
+                c <= 1 -> R.drawable.ic_sun
+                c <= 48 -> R.drawable.ic_cloud
+                else -> R.drawable.ic_rain
+            })
         }
     }
 
