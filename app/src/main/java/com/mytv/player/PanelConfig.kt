@@ -2,15 +2,17 @@ package com.mytv.player
 
 /**
  * ربط التطبيق بلوحة التحكم.
- * انسخ القيمتين من صفحة "الإعدادات" في اللوحة، ثم أعد بناء التطبيق.
- * إذا تركتهما فارغتين يعمل التطبيق بدون لوحة.
+ * إذا تركت API_URL فارغاً يعمل التطبيق بدون لوحة.
  */
 object PanelConfig {
-    /** مثال: https://your-domain.com/panel/api.php */
-    const val API_URL = ""
+    /** رابط api.php في لوحة التحكم */
+    const val API_URL = "https://skytv.online/panel/api.php"
 
-    /** مفتاح الـ API من صفحة الإعدادات في اللوحة */
+    /**
+     * اختياري: يُستخدم فقط إذا فعّلت "طلب المفتاح" في اللوحة.
+     * الحماية الأساسية أن كل جهاز مربوط بمفتاحه السري الخاص.
+     */
     const val API_KEY = ""
 
-    val enabled: Boolean get() = API_URL.isNotBlank() && API_KEY.isNotBlank()
+    val enabled: Boolean get() = API_URL.isNotBlank()
 }
