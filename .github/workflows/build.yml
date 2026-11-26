@@ -1,0 +1,49 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unpack source (first upload only)
+        id: src
+        run: |
+          if [ -f source.tgz ]; then
+            tar xzf source.tgz
+            git rm -q source.tgz
+            git config user.name "github-actions[bot]"
+            git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Unpack project source"
+            git push
+          fi
+          if [ -f settings.gradle.kts ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "No source yet"; fi
+
+      - uses: actions/setup-java@v4
+        if: steps.src.outputs.ok == 'true'
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.src.outputs.ok == 'true'
+
+      - name: Build APK
+        if: steps.src.outputs.ok == 'true'
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        if: steps.src.outputs.ok == 'true'
+        with:
+          name: MyTV-apk
+          path: app/build/outputs/apk/release/*.apk
