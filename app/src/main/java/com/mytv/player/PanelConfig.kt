@@ -14,5 +14,9 @@ object PanelConfig {
      */
     const val API_KEY = ""
 
+    /** السيرفر الافتراضي إذا لم تصل قائمة السيرفرات من اللوحة بعد */
+    const val DEFAULT_SERVER = "http://dreammax.lol"
+    const val DEFAULT_SERVER_NAME = "DreamMax"
+
     val enabled: Boolean get() = API_URL.isNotBlank()
 }

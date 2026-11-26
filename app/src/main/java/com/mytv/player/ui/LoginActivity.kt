@@ -76,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
         editingId?.let { id ->
             App.instance.prefs.profiles().firstOrNull { it.id == id }?.let { p ->
                 etName.setText(p.name)
-                if (p.kind == Profile.M3U) rbM3u.isChecked = true else rbXtream.isChecked = true
+                rbXtream.isChecked = true
                 etServer.setText(p.server)
                 val i = dnsList.indexOfFirst { d -> d.url?.trimEnd('/') == p.server.trimEnd('/') }
                 if (i >= 0) spDns.setSelection(i)
@@ -109,35 +109,37 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun updateMode() {
-        xtreamFields.isVisible = rbXtream.isChecked
-        m3uFields.isVisible = rbM3u.isChecked
+        xtreamFields.isVisible = true
+        m3uFields.isVisible = false
     }
 
-    /** إذا أضاف المدير سيرفرات في اللوحة: قائمة اختيار بدل كتابة الرابط. */
+    /**
+     * السيرفر يأتي من اللوحة (أو الافتراضي) — المستخدم يكتب اسم المستخدم وكلمة المرور فقط.
+     * إذا كان في اللوحة أكثر من سيرفر تظهر قائمة اختيار.
+     */
     private fun setupDns() {
+        // نخفي خانات الرابط والسيرفر واختيار M3U
+        findViewById<View>(R.id.rgType).isVisible = false
+        rbXtream.isChecked = true
+        etServer.isVisible = false
         dnsList = com.mytv.player.data.Panel.cached()?.dns.orEmpty().filter { !it.url.isNullOrBlank() }
-        if (dnsList.isEmpty()) return
-        val names = dnsList.map { it.name?.takeIf { n -> n.isNotBlank() } ?: it.url.orEmpty() } +
-            getString(R.string.other_server)
-        spDns.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, names)
-        spDns.isVisible = true
-        spDns.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, pos: Int, id: Long) {
-                etServer.isVisible = pos >= dnsList.size   // "سيرفر آخر" يظهر خانة الرابط
+            .ifEmpty {
+                listOf(com.mytv.player.data.PanelDns(0, com.mytv.player.PanelConfig.DEFAULT_SERVER_NAME,
+                    com.mytv.player.PanelConfig.DEFAULT_SERVER))
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
-        }
+        val names = dnsList.map { it.name?.takeIf { n -> n.isNotBlank() } ?: it.url.orEmpty() }
+        spDns.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, names)
+        spDns.isVisible = dnsList.size > 1
     }
 
     private fun selectedServer(): String {
-        val pos = spDns.selectedItemPosition
-        return if (spDns.isVisible && pos in dnsList.indices) dnsList[pos].url.orEmpty()
-               else etServer.text.toString().trim()
+        val pos = spDns.selectedItemPosition.coerceIn(0, dnsList.size - 1)
+        return dnsList[pos].url.orEmpty()
     }
 
     private fun connect() {
         val id = editingId ?: UUID.randomUUID().toString()
-        var profile = if (rbXtream.isChecked) {
+        var profile = if (true) {
             val server = selectedServer()
             val user = etUser.text.toString().trim()
             val pass = etPass.text.toString().trim()
