@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My TV</string>
+
+    <string name="login_title">أضف اشتراكك</string>
+    <string name="xtream">Xtream Codes</string>
+    <string name="m3u">رابط M3U</string>
+    <string name="server">رابط السيرفر (http://host:port)</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="password">كلمة المرور</string>
+    <string name="m3u_url">رابط قائمة M3U</string>
+    <string name="connect">دخول</string>
+    <string name="fill_fields">يرجى تعبئة جميع الحقول</string>
+    <string name="login_failed">تعذّر الاتصال: %1$s</string>
+
+    <string name="live">البث المباشر</string>
+    <string name="movies">الأفلام</string>
+    <string name="series">المسلسلات</string>
+    <string name="settings">الإعدادات</string>
+    <string name="account">الحساب: %1$s</string>
+    <string name="reload">تحديث البيانات</string>
+    <string name="edit_account">تغيير الاشتراك</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="data_cleared">سيتم تحديث البيانات</string>
+
+    <string name="all">الكل</string>
+    <string name="favorites">المفضلة</string>
+    <string name="add_group">إضافة قروب</string>
+    <string name="new_group">قروب جديد</string>
+    <string name="group_name">اسم القروب</string>
+    <string name="group_created">تم إنشاء القروب. اضغط مطولاً على أي عنصر لإضافته.</string>
+    <string name="rename">إعادة تسمية</string>
+    <string name="delete">حذف</string>
+    <string name="save">حفظ</string>
+    <string name="saved">تم الحفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="confirm_delete_group">حذف القروب \"%1$s\"؟ لن تُحذف العناصر نفسها.</string>
+    <string name="add_favorite">إضافة إلى المفضلة</string>
+    <string name="remove_favorite">إزالة من المفضلة</string>
+    <string name="add_to_group">إضافة إلى قروب…</string>
+    <string name="remove_from_group">إزالة من \"%1$s\"</string>
+    <string name="choose_groups">اختر القروبات</string>
+    <string name="add_category_to_group">إضافة كل \"%1$s\" إلى…</string>
+    <string name="added_n">تمت إضافة %1$d عنصر</string>
+    <string name="search">بحث…</string>
+    <string name="load_error">تعذّر التحميل: %1$s</string>
+    <string name="empty_list">لا يوجد محتوى</string>
+    <string name="empty_group">القائمة فارغة.\nاضغط مطولاً على أي عنصر (أو زر القائمة في الريموت) لإضافته.</string>
+
+    <string name="no_episodes">لا توجد حلقات</string>
+    <string name="playback_error">خطأ في التشغيل: %1$s</string>
+</resources>

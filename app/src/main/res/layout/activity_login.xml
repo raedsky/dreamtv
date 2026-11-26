@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_gravity="center" android:gravity="center_horizontal"
+        android:orientation="vertical" android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:maxWidth="520dp" android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center" android:text="@string/app_name"
+                android:textColor="@color/accent" android:textSize="34sp" android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
+                android:gravity="center" android:text="@string/login_title"
+                android:textColor="@color/text_secondary" android:textSize="16sp" />
+
+            <RadioGroup
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center" android:orientation="horizontal">
+                <RadioButton
+                    android:id="@+id/rbXtream"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:checked="true" android:padding="8dp" android:text="@string/xtream"
+                    android:textColor="@color/text_primary" />
+                <RadioButton
+                    android:id="@+id/rbM3u"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp" android:padding="8dp" android:text="@string/m3u"
+                    android:textColor="@color/text_primary" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/xtreamFields"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <EditText android:id="@+id/etServer" style="@style/Field"
+                    android:hint="@string/server" android:inputType="textUri" />
+                <EditText android:id="@+id/etUser" style="@style/Field"
+                    android:hint="@string/username" android:inputType="text" />
+                <EditText android:id="@+id/etPass" style="@style/Field"
+                    android:hint="@string/password" android:inputType="textPassword" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/m3uFields"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:visibility="gone">
+                <EditText android:id="@+id/etM3u" style="@style/Field"
+                    android:hint="@string/m3u_url" android:inputType="textUri" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:gravity="center"
+                android:textColor="#FF6B6B" android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnConnect"
+                android:layout_width="match_parent" android:layout_height="56dp"
+                android:layout_marginTop="20dp" android:text="@string/connect"
+                android:textSize="18sp" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="center" android:layout_marginTop="12dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
