@@ -381,11 +381,10 @@ class BrowseActivity : AppCompatActivity() {
                 return
             }
             stopPreview()
-            PlayQueue.set(playable.map { PlayQueue.Entry(it.name, it.url!!) }, start, live = true)
+            Playback.play(this, playable.map { PlayQueue.Entry(it.name, it.url!!) }, start, live = true)
         } else {
-            PlayQueue.set(listOf(PlayQueue.Entry(item.name, item.url ?: return)), 0, live = false)
+            Playback.play(this, listOf(PlayQueue.Entry(item.name, item.url ?: return)), 0, live = false)
         }
-        PlayerActivity.start(this)
     }
 
     // ---------------- المعاينة ----------------

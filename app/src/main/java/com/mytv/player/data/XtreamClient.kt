@@ -13,7 +13,8 @@ class XtreamClient(
     private val http: OkHttpClient,
     server: String,
     private val user: String,
-    private val pass: String
+    private val pass: String,
+    private val liveExt: String = "ts"
 ) {
     val base: String = normalizeServer(server)
 
@@ -78,7 +79,7 @@ class XtreamClient(
                 ContentType.LIVE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null
                     StreamItem("L:$id", id, name, o.str("stream_icon"), cat, type,
-                        "$base/live/$user/$pass/$id.ts")
+                        "$base/live/$user/$pass/$id.$liveExt")
                 }
                 ContentType.MOVIE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null

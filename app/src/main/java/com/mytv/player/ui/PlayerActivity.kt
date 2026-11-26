@@ -24,6 +24,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
@@ -40,15 +41,46 @@ object Players {
             .setConnectTimeoutMs(15_000)
             .setReadTimeoutMs(20_000)
         val dataSource = DefaultDataSource.Factory(ctx, http)
-        return ExoPlayer.Builder(ctx)
-            .setMediaSourceFactory(DefaultMediaSourceFactory(ctx).setDataSourceFactory(dataSource))
+        // مخزن أكبر = تقطيع أقل في البث المباشر
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(30_000, 60_000, 2_500, 5_000)
             .build()
+        val player = ExoPlayer.Builder(ctx)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(ctx).setDataSourceFactory(dataSource))
+            .setLoadControl(loadControl)
+            .build()
+        if (App.instance.prefs.sdOnly) {
+            // إذا كان السيرفر يوفر أكثر من جودة نختار SD
+            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                .setMaxVideoSizeSd()
+                .build()
+        }
+        return player
     }
 
     fun mediaItem(url: String): MediaItem {
         val b = MediaItem.Builder().setUri(url)
         if (url.contains(".m3u8", ignoreCase = true)) b.setMimeType(MimeTypes.APPLICATION_M3U8)
         return b.build()
+    }
+}
+
+/** يشغّل في المشغل المدمج أو في مشغل خارجي حسب الإعدادات. */
+object Playback {
+    fun play(act: android.app.Activity, entries: List<PlayQueue.Entry>, index: Int, live: Boolean) {
+        PlayQueue.set(entries, index, live)
+        val e = PlayQueue.current ?: return
+        if (App.instance.prefs.playerMode == com.mytv.player.data.Prefs.PLAYER_EXTERNAL) {
+            val intent = Intent(Intent.ACTION_VIEW)
+                .setDataAndType(android.net.Uri.parse(e.url), "video/*")
+                .putExtra("title", e.title)
+            if (intent.resolveActivity(act.packageManager) != null) {
+                act.startActivity(Intent.createChooser(intent, e.title))
+                return
+            }
+            Toast.makeText(act, R.string.no_external_player, Toast.LENGTH_LONG).show()
+        }
+        PlayerActivity.start(act)
     }
 }
 

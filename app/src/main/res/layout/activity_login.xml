@@ -23,6 +23,11 @@
                 android:gravity="center" android:text="@string/login_title"
                 android:textColor="@color/text_secondary" android:textSize="16sp" />
 
+            <EditText android:id="@+id/etName" style="@style/Field"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/playlist_name" android:inputType="text"
+                android:imeOptions="actionNext" />
+
             <RadioGroup
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:gravity="center" android:orientation="horizontal">

@@ -8,15 +8,35 @@ import kotlinx.coroutines.withContext
 import okhttp3.Request
 import java.io.IOException
 
+/** يستخرج (اسم المسلسل، الموسم، الحلقة) من أسماء مثل "Name S01 E05" أو "الاسم الموسم 1 الحلقة 5". */
+internal fun parseEpisode(title: String): Triple<String, Int, Int>? {
+    val patterns = listOf(
+        Regex("""^(.*?)[\s._\-|:]*[Ss](\d{1,2})[\s._\-]*[Ee][Pp]?(\d{1,4})"""),
+        Regex("""^(.*?)[\s._\-|:]*(\d{1,2})[xX](\d{1,3})\b"""),
+        Regex("""^(.*?)\s*(?:الموسم|موسم)\s*(\d{1,2})\s*[-_|:]*\s*(?:الحلقة|حلقة)\s*(\d{1,4})""")
+    )
+    for (r in patterns) {
+        val m = r.find(title) ?: continue
+        val name = m.groupValues[1].trim().trimEnd('-', '_', '|', ':', '.').trim()
+        if (name.isEmpty()) continue
+        return Triple(name, m.groupValues[2].toInt(), m.groupValues[3].toInt())
+    }
+    return null
+}
+
+private const val M3U_SERIES = "MS:"
+
 class Repository(private val prefs: Prefs) {
 
     data class Content(val categories: List<Category>, val items: List<StreamItem>)
 
     private val cache = HashMap<ContentType, Content>()
     private var m3u: List<M3uEntry>? = null
+    /** حلقات مسلسلات M3U بعد تجميعها: مفتاح المسلسل ← الحلقات */
+    private val m3uEpisodes = HashMap<String, List<Episode>>()
     private val mutex = Mutex()
 
-    private fun xtream(p: Profile) = XtreamClient(App.http, p.server, p.username, p.password)
+    private fun xtream(p: Profile) = XtreamClient(App.http, p.server, p.username, p.password, prefs.liveFormat)
 
     /** يتحقق من الاشتراك قبل حفظه. */
     /** يرجع الملف الشخصي بعد التحقق (مع تاريخ الانتهاء لحسابات Xtream). */
@@ -51,6 +71,7 @@ class Repository(private val prefs: Prefs) {
     }
 
     suspend fun episodes(item: StreamItem): List<Episode> = withContext(Dispatchers.IO) {
+        if (item.key.startsWith(M3U_SERIES)) return@withContext m3uEpisodes[item.key] ?: emptyList()
         val p = prefs.profile ?: throw IOException("Not logged in")
         xtream(p).seriesEpisodes(item.id)
     }
@@ -58,10 +79,14 @@ class Repository(private val prefs: Prefs) {
     fun clear() {
         cache.clear()
         m3u = null
+        m3uEpisodes.clear()
     }
 
     private fun loadM3u(p: Profile, type: ContentType, force: Boolean): Content {
         val all = (if (force) null else m3u) ?: fetchM3u(p.m3uUrl).also { m3u = it }
+        if (type == ContentType.SERIES) {
+            return buildM3uSeries(all.filter { M3uParser.classify(it.url) == ContentType.SERIES })
+        }
         val cats = LinkedHashMap<String, Category>()
         val items = ArrayList<StreamItem>()
         for (e in all) {
@@ -69,6 +94,40 @@ class Repository(private val prefs: Prefs) {
             if (e.group !in cats) cats[e.group] = Category(e.group, e.group)
             items += StreamItem("U:${e.url}", e.url, e.name, e.logo, e.group, type, e.url)
         }
+        return Content(cats.values.toList(), items)
+    }
+
+    /**
+     * في قوائم M3U كل حلقة تأتي كعنصر مستقل ("Name S01 E05").
+     * هنا نجمعها: مسلسل واحد ← مواسم ← حلقات.
+     */
+    private fun buildM3uSeries(entries: List<M3uEntry>): Content {
+        class Acc(val name: String, val group: String, var logo: String?) {
+            val eps = ArrayList<Episode>()
+        }
+        val cats = LinkedHashMap<String, Category>()
+        val series = LinkedHashMap<String, Acc>()
+        val singles = ArrayList<StreamItem>()
+        for (e in entries) {
+            if (e.group !in cats) cats[e.group] = Category(e.group, e.group)
+            val parsed = parseEpisode(e.name)
+            if (parsed == null) {
+                singles += StreamItem("U:${e.url}", e.url, e.name, e.logo, e.group, ContentType.SERIES, e.url)
+                continue
+            }
+            val (name, season, number) = parsed
+            val key = "$M3U_SERIES${e.group}|${name.lowercase()}"
+            val acc = series.getOrPut(key) { Acc(name, e.group, e.logo) }
+            if (acc.logo == null) acc.logo = e.logo
+            acc.eps += Episode(e.url, e.name, season, number, e.url, e.logo)
+        }
+        m3uEpisodes.clear()
+        val items = ArrayList<StreamItem>()
+        for ((key, a) in series) {
+            m3uEpisodes[key] = a.eps.sortedWith(compareBy({ it.season }, { it.number }))
+            items += StreamItem(key, key, a.name, a.logo, a.group, ContentType.SERIES, null)
+        }
+        items += singles
         return Content(cats.values.toList(), items)
     }
 

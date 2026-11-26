@@ -56,4 +56,23 @@
     <string name="back">Back</string>
     <string name="prev_channel">Previous channel</string>
     <string name="next_channel">Next channel</string>
+    <string name="playlists">Playlists</string>
+    <string name="add_playlist">Add playlist</string>
+    <string name="playlist_name">Playlist name (optional)</string>
+    <string name="active_playlist">Playlist: %1$s</string>
+    <string name="no_playlist">No playlist yet — press Playlists to add one</string>
+    <string name="use">Use</string>
+    <string name="edit">Edit</string>
+    <string name="confirm_delete_playlist">Delete playlist \"%1$s\"?</string>
+    <string name="choose_player">Choose player</string>
+    <string name="player_setting">Player: %1$s</string>
+    <string name="player_internal">Built-in player</string>
+    <string name="player_external">External player (VLC, MX Player…)</string>
+    <string name="no_external_player">No external player installed — using the built-in player</string>
+    <string name="live_format">Live stream format: %1$s</string>
+    <string name="sd_only">SD quality only: %1$s</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="season">Season %1$d</string>
+    <string name="episodes">Episodes</string>
 </resources>

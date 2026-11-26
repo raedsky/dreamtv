@@ -39,6 +39,8 @@ data class UserGroup(
 
 data class Profile(
     val kind: String,
+    val id: String = "",
+    val name: String = "",
     val server: String = "",
     val username: String = "",
     val password: String = "",

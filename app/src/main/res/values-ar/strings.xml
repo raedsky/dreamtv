@@ -56,4 +56,23 @@
     <string name="back">رجوع</string>
     <string name="prev_channel">القناة السابقة</string>
     <string name="next_channel">القناة التالية</string>
+    <string name="playlists">قوائم التشغيل</string>
+    <string name="add_playlist">إضافة قائمة تشغيل</string>
+    <string name="playlist_name">اسم القائمة (اختياري)</string>
+    <string name="active_playlist">القائمة: %1$s</string>
+    <string name="no_playlist">لا توجد قائمة تشغيل — اضغط «قوائم التشغيل» لإضافة قائمة</string>
+    <string name="use">استخدام</string>
+    <string name="edit">تعديل</string>
+    <string name="confirm_delete_playlist">حذف القائمة \"%1$s\"؟</string>
+    <string name="choose_player">اختر المشغل</string>
+    <string name="player_setting">المشغل: %1$s</string>
+    <string name="player_internal">المشغل المدمج</string>
+    <string name="player_external">مشغل خارجي (VLC، MX Player…)</string>
+    <string name="no_external_player">لا يوجد مشغل خارجي مثبت — سيتم استخدام المشغل المدمج</string>
+    <string name="live_format">صيغة البث المباشر: %1$s</string>
+    <string name="sd_only">جودة SD فقط: %1$s</string>
+    <string name="on">تشغيل</string>
+    <string name="off">إيقاف</string>
+    <string name="season">الموسم %1$d</string>
+    <string name="episodes">الحلقات</string>
 </resources>

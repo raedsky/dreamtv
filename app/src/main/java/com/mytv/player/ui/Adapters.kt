@@ -160,6 +160,11 @@ class EpisodeAdapter(
     }
 
     companion object {
-        fun episodeLabel(e: Episode) = String.format("S%02d E%02d  •  %s", e.season, e.number, e.title)
+        fun episodeLabel(e: Episode): String {
+            val code = String.format(java.util.Locale.US, "S%02d E%02d", e.season, e.number)
+            // في M3U العنوان يحتوي الرقم أصلاً، فلا نكرّره
+            return if (e.title.isBlank() || com.mytv.player.data.parseEpisode(e.title) != null) code
+                   else "$code  •  ${e.title}"
+        }
     }
 }

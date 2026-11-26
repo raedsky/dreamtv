@@ -22,9 +22,21 @@
             android:layout_marginTop="12dp" android:gravity="center"
             android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" />
     </LinearLayout>
-    <FrameLayout
+    <LinearLayout
         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="7"
-        android:layout_marginStart="16dp">
+        android:layout_marginStart="16dp" android:orientation="vertical">
+    <!-- أزرار المواسم -->
+    <HorizontalScrollView
+        android:id="@+id/seasonScroll"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp" android:scrollbars="none" android:visibility="gone">
+        <LinearLayout
+            android:id="@+id/seasonBar"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+    <FrameLayout
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvEpisodes"
             android:layout_width="match_parent" android:layout_height="match_parent" />
@@ -38,4 +50,5 @@
             android:layout_gravity="center" android:gravity="center"
             android:textColor="@color/text_secondary" android:visibility="gone" />
     </FrameLayout>
+    </LinearLayout>
 </LinearLayout>

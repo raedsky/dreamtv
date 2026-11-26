@@ -16,18 +16,25 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.mytv.player.App
 import com.mytv.player.R
+import com.mytv.player.data.Prefs
 import com.mytv.player.data.Profile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import java.util.UUID
 
+/** إضافة قائمة تشغيل جديدة أو تعديل قائمة موجودة. */
 class LoginActivity : AppCompatActivity() {
 
     companion object {
-        private const val EXTRA_EDIT = "edit"
-        fun edit(ctx: Context) =
-            ctx.startActivity(Intent(ctx, LoginActivity::class.java).putExtra(EXTRA_EDIT, true))
+        private const val EXTRA_ID = "id"
+        fun add(ctx: Context) = ctx.startActivity(Intent(ctx, LoginActivity::class.java))
+        fun edit(ctx: Context, id: String) =
+            ctx.startActivity(Intent(ctx, LoginActivity::class.java).putExtra(EXTRA_ID, id))
     }
 
+    private var editingId: String? = null
+
+    private lateinit var etName: EditText
     private lateinit var rbXtream: RadioButton
     private lateinit var rbM3u: RadioButton
     private lateinit var xtreamFields: View
@@ -42,14 +49,9 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val app = App.instance
-        val editing = intent.getBooleanExtra(EXTRA_EDIT, false)
-        if (!editing && app.prefs.profile != null) {
-            openHome()
-            return
-        }
         setContentView(R.layout.activity_login)
 
+        etName = findViewById(R.id.etName)
         rbXtream = findViewById(R.id.rbXtream)
         rbM3u = findViewById(R.id.rbM3u)
         xtreamFields = findViewById(R.id.xtreamFields)
@@ -65,17 +67,21 @@ class LoginActivity : AppCompatActivity() {
         rbXtream.setOnCheckedChangeListener { _, _ -> updateMode() }
         rbM3u.setOnCheckedChangeListener { _, _ -> updateMode() }
 
-        app.prefs.profile?.let { p ->
-            if (p.kind == Profile.M3U) rbM3u.isChecked = true else rbXtream.isChecked = true
-            etServer.setText(p.server)
-            etUser.setText(p.username)
-            etPass.setText(p.password)
-            etM3u.setText(p.m3uUrl)
+        editingId = intent.getStringExtra(EXTRA_ID)
+        editingId?.let { id ->
+            App.instance.prefs.profiles().firstOrNull { it.id == id }?.let { p ->
+                etName.setText(p.name)
+                if (p.kind == Profile.M3U) rbM3u.isChecked = true else rbXtream.isChecked = true
+                etServer.setText(p.server)
+                etUser.setText(p.username)
+                etPass.setText(p.password)
+                etM3u.setText(p.m3uUrl)
+            }
         }
         updateMode()
 
         // في أجهزة البوكس: الضغط على OK فوق الخانة يفتح الكيبورد
-        for (et in listOf(etServer, etUser, etPass, etM3u)) {
+        for (et in listOf(etName, etServer, etUser, etPass, etM3u)) {
             et.setOnClickListener { showKeyboard(it as EditText) }
         }
         etPass.setOnEditorActionListener { _, actionId, _ ->
@@ -101,27 +107,32 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun connect() {
-        val profile = if (rbXtream.isChecked) {
+        val id = editingId ?: UUID.randomUUID().toString()
+        var profile = if (rbXtream.isChecked) {
             val server = etServer.text.toString().trim()
             val user = etUser.text.toString().trim()
             val pass = etPass.text.toString().trim()
             if (server.isEmpty() || user.isEmpty() || pass.isEmpty()) {
                 tvError.setText(R.string.fill_fields); tvError.isVisible = true; return
             }
-            Profile(Profile.XTREAM, server = server, username = user, password = pass)
+            Profile(Profile.XTREAM, id = id, server = server, username = user, password = pass)
         } else {
             val url = etM3u.text.toString().trim()
             if (url.isEmpty()) {
                 tvError.setText(R.string.fill_fields); tvError.isVisible = true; return
             }
-            Profile(Profile.M3U, m3uUrl = url)
+            Profile(Profile.M3U, id = id, m3uUrl = url)
         }
+        val name = etName.text.toString().trim()
+        profile = profile.copy(name = name.ifEmpty { Prefs.defaultName(profile) })
 
         setBusy(true)
         lifecycleScope.launch {
             try {
-                App.instance.prefs.profile = App.instance.repo.login(profile)
-                openHome()
+                val saved = App.instance.repo.login(profile)
+                App.instance.prefs.saveProfile(saved)
+                App.instance.prefs.setActive(saved.id)
+                finish()   // نرجع للرئيسية
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -136,11 +147,5 @@ class LoginActivity : AppCompatActivity() {
         progress.isVisible = busy
         btnConnect.isEnabled = !busy
         if (busy) tvError.isVisible = false
-    }
-
-    private fun openHome() {
-        startActivity(Intent(this, HomeActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
-        finish()
     }
 }
