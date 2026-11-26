@@ -16,6 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
@@ -85,6 +86,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var gestures: GestureDetector
     private var hasTouch = false
     private val hideTitle = Runnable { tvTitle.isVisible = false }
+    private var controllerVisible = false
+    private val hideOverlay = Runnable { if (!controllerVisible) setOverlayVisible(false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,8 +110,13 @@ class PlayerActivity : AppCompatActivity() {
             for (id in intArrayOf(R.id.btnBack, R.id.btnChUp, R.id.btnChDown)) findViewById<View>(id).isFocusable = false
         }
         playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
-            setOverlayVisible(visibility == View.VISIBLE)
+            controllerVisible = visibility == View.VISIBLE
+            setOverlayVisible(controllerVisible)
         })
+        if (PlayQueue.live) {
+            playerView.setShowFastForwardButton(false)
+            playerView.setShowRewindButton(false)
+        }
         setOverlayVisible(false)
 
         // السحب لأعلى/لأسفل على الشاشة يغيّر القناة
@@ -154,11 +162,33 @@ class PlayerActivity : AppCompatActivity() {
                 ).show()
             }
         })
-        playerView.player = p
+        // أزرار ⏮ ⏭ في شريط التحكم تغيّر القناة / الحلقة
+        playerView.player = wrapForZapping(p)
         player = p
         playCurrent()
         // على التابلت والجوال: نُظهر الأزرار في البداية حتى يعرف المستخدم مكانها
         if (hasTouch) playerView.showController()
+    }
+
+    private fun wrapForZapping(p: ExoPlayer): Player = object : ForwardingPlayer(p) {
+        private fun multi() = PlayQueue.entries.size > 1
+        private val zapCommands = intArrayOf(
+            Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
+        )
+        override fun getAvailableCommands(): Player.Commands {
+            val b = super.getAvailableCommands().buildUpon()
+            if (multi()) b.addAll(*zapCommands)
+            return b.build()
+        }
+        override fun isCommandAvailable(command: Int): Boolean =
+            (multi() && command in zapCommands) || super.isCommandAvailable(command)
+        override fun hasNextMediaItem() = multi() || super.hasNextMediaItem()
+        override fun hasPreviousMediaItem() = multi() || super.hasPreviousMediaItem()
+        override fun seekToNext() { if (multi()) zap(1) else super.seekToNext() }
+        override fun seekToNextMediaItem() { if (multi()) zap(1) else super.seekToNextMediaItem() }
+        override fun seekToPrevious() { if (multi()) zap(-1) else super.seekToPrevious() }
+        override fun seekToPreviousMediaItem() { if (multi()) zap(-1) else super.seekToPreviousMediaItem() }
     }
 
     private fun setOverlayVisible(visible: Boolean) {
@@ -167,6 +197,12 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && ::btnBack.isInitialized) {
+            // أي لمسة تُظهر زر الرجوع وأزرار القناة لمدة 4 ثوانٍ
+            setOverlayVisible(true)
+            btnBack.removeCallbacks(hideOverlay)
+            btnBack.postDelayed(hideOverlay, 4000)
+        }
         if (::gestures.isInitialized && gestures.onTouchEvent(ev)) return true
         return super.dispatchTouchEvent(ev)
     }
@@ -191,7 +227,13 @@ class PlayerActivity : AppCompatActivity() {
     private fun zap(delta: Int) {
         val size = PlayQueue.entries.size
         if (size <= 1) return
-        PlayQueue.index = (PlayQueue.index + delta + size) % size
+        if (PlayQueue.live) {
+            PlayQueue.index = (PlayQueue.index + delta + size) % size   // القنوات تدور
+        } else {
+            val next = PlayQueue.index + delta                         // الحلقات لا تدور
+            if (next !in 0 until size) return
+            PlayQueue.index = next
+        }
         playCurrent()
     }
 
