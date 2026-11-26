@@ -42,7 +42,9 @@ data class Profile(
     val server: String = "",
     val username: String = "",
     val password: String = "",
-    val m3uUrl: String = ""
+    val m3uUrl: String = "",
+    /** تاريخ انتهاء الاشتراك (ثواني Unix) أو null = غير محدود / غير معروف */
+    val expiry: Long? = null
 ) {
     companion object {
         const val XTREAM = "xtream"

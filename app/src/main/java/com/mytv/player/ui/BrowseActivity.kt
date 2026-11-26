@@ -3,9 +3,11 @@ package com.mytv.player.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -15,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,6 +62,14 @@ class BrowseActivity : AppCompatActivity() {
     private var current: CategoryRow? = null
     private var currentItems: List<StreamItem> = emptyList()
 
+    // معاينة البث المباشر
+    private var previewPlayer: ExoPlayer? = null
+    private var previewItem: StreamItem? = null
+    private lateinit var previewView: PlayerView
+    private lateinit var previewHint: TextView
+    private lateinit var previewTitle: TextView
+    private lateinit var previewCategory: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         type = runCatching { ContentType.valueOf(intent.getStringExtra(EXTRA_TYPE) ?: "") }
@@ -88,13 +100,16 @@ class BrowseActivity : AppCompatActivity() {
 
         etSearch.doAfterTextChanged { applyFilter() }
 
+        if (type == ContentType.LIVE) setupPreview()
+
         load(force = false)
     }
 
     private fun spanCount(): Int {
         val widthDp = resources.configuration.screenWidthDp
         val paneDp = widthDp * 0.70f
-        val cellDp = if (type == ContentType.LIVE) 240f else 140f
+        if (type == ContentType.LIVE) return 1   // قائمة قنوات بجانب المعاينة
+        val cellDp = 140f
         return (paneDp / cellDp).toInt().coerceAtLeast(1)
     }
 
@@ -359,10 +374,69 @@ class BrowseActivity : AppCompatActivity() {
         val playable = list.filter { it.url != null }
         val start = playable.indexOf(item).coerceAtLeast(0)
         if (type == ContentType.LIVE) {
+            // أول ضغطة: معاينة، الضغطة الثانية على نفس القناة: ملء الشاشة
+            if (previewItem?.key != item.key) {
+                startPreview(item)
+                return
+            }
+            stopPreview()
             PlayQueue.set(playable.map { PlayQueue.Entry(it.name, it.url!!) }, start, live = true)
         } else {
             PlayQueue.set(listOf(PlayQueue.Entry(item.name, item.url ?: return)), 0, live = false)
         }
         PlayerActivity.start(this)
+    }
+
+    // ---------------- المعاينة ----------------
+
+    private fun setupPreview() {
+        val pane = findViewById<View>(R.id.previewPane)
+        val box = findViewById<View>(R.id.previewBox)
+        previewView = findViewById(R.id.previewPlayer)
+        previewHint = findViewById(R.id.previewHint)
+        previewTitle = findViewById(R.id.previewTitle)
+        previewCategory = findViewById(R.id.previewCategory)
+
+        pane.isVisible = true
+        (findViewById<View>(R.id.itemsPane).layoutParams as LinearLayout.LayoutParams).weight = 3.5f
+        (pane.layoutParams as LinearLayout.LayoutParams).weight = 3.5f
+        pane.requestLayout()
+        // مقاس 16:9
+        box.post {
+            box.layoutParams = box.layoutParams.apply { height = box.width * 9 / 16 }
+        }
+        box.setOnClickListener { previewItem?.let { openItem(it, 0) } }
+    }
+
+    private fun startPreview(item: StreamItem) {
+        val url = item.url ?: return
+        previewItem = item
+        val p = previewPlayer ?: Players.create(this).also {
+            previewPlayer = it
+            previewView.player = it
+        }
+        p.setMediaItem(Players.mediaItem(url))
+        p.prepare()
+        p.playWhenReady = true
+        previewHint.isVisible = false
+        previewTitle.text = item.name
+        previewCategory.text = content?.categories?.firstOrNull { it.id == item.categoryId }?.name.orEmpty()
+    }
+
+    private fun stopPreview() {
+        previewPlayer?.release()
+        previewPlayer = null
+        if (::previewView.isInitialized) previewView.player = null
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // الرجوع من ملء الشاشة: نكمل المعاينة على نفس القناة
+        if (type == ContentType.LIVE) previewItem?.let { startPreview(it) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopPreview()
     }
 }

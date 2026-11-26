@@ -25,6 +25,28 @@ import androidx.media3.ui.PlayerView
 import com.mytv.player.App
 import com.mytv.player.R
 
+/** إنشاء مشغّل موحّد للمعاينة وملء الشاشة. */
+object Players {
+    @OptIn(UnstableApi::class)
+    fun create(ctx: Context): ExoPlayer {
+        val http = DefaultHttpDataSource.Factory()
+            .setUserAgent(App.USER_AGENT)
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(15_000)
+            .setReadTimeoutMs(20_000)
+        val dataSource = DefaultDataSource.Factory(ctx, http)
+        return ExoPlayer.Builder(ctx)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(ctx).setDataSourceFactory(dataSource))
+            .build()
+    }
+
+    fun mediaItem(url: String): MediaItem {
+        val b = MediaItem.Builder().setUri(url)
+        if (url.contains(".m3u8", ignoreCase = true)) b.setMimeType(MimeTypes.APPLICATION_M3U8)
+        return b.build()
+    }
+}
+
 /** قائمة التشغيل الحالية (تُستخدم لتقليب القنوات بالأسهم في المباشر). */
 object PlayQueue {
     data class Entry(val title: String, val url: String)
@@ -84,15 +106,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun initPlayer() {
-        val http = DefaultHttpDataSource.Factory()
-            .setUserAgent(App.USER_AGENT)
-            .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(15_000)
-            .setReadTimeoutMs(20_000)
-        val dataSource = DefaultDataSource.Factory(this, http)
-        val p = ExoPlayer.Builder(this)
-            .setMediaSourceFactory(DefaultMediaSourceFactory(this).setDataSourceFactory(dataSource))
-            .build()
+        val p = Players.create(this)
         p.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 Toast.makeText(
@@ -110,9 +124,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun playCurrent() {
         val e = PlayQueue.current ?: return
         val p = player ?: return
-        val builder = MediaItem.Builder().setUri(e.url)
-        if (e.url.contains(".m3u8", ignoreCase = true)) builder.setMimeType(MimeTypes.APPLICATION_M3U8)
-        p.setMediaItem(builder.build())
+        p.setMediaItem(Players.mediaItem(e.url))
         p.prepare()
         p.playWhenReady = true
         showTitle(e.title)

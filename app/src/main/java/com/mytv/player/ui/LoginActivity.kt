@@ -120,8 +120,7 @@ class LoginActivity : AppCompatActivity() {
         setBusy(true)
         lifecycleScope.launch {
             try {
-                App.instance.repo.login(profile)
-                App.instance.prefs.profile = profile
+                App.instance.prefs.profile = App.instance.repo.login(profile)
                 openHome()
             } catch (e: CancellationException) {
                 throw e

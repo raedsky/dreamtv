@@ -19,16 +19,18 @@ class Repository(private val prefs: Prefs) {
     private fun xtream(p: Profile) = XtreamClient(App.http, p.server, p.username, p.password)
 
     /** يتحقق من الاشتراك قبل حفظه. */
-    suspend fun login(p: Profile) = withContext(Dispatchers.IO) {
+    /** يرجع الملف الشخصي بعد التحقق (مع تاريخ الانتهاء لحسابات Xtream). */
+    suspend fun login(p: Profile): Profile = withContext(Dispatchers.IO) {
         mutex.withLock {
             cache.clear()
             m3u = null
             if (p.kind == Profile.XTREAM) {
-                xtream(p).authenticate()
+                p.copy(expiry = xtream(p).authenticate())
             } else {
                 val list = fetchM3u(p.m3uUrl)
                 if (list.isEmpty()) throw IOException("Playlist is empty")
                 m3u = list
+                p
             }
         }
     }

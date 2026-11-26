@@ -35,7 +35,8 @@ class XtreamClient(
         }
     }
 
-    fun authenticate() {
+    /** يتحقق من الحساب ويرجع تاريخ الانتهاء (ثواني Unix) إن وُجد. */
+    fun authenticate(): Long? {
         val root = request(null)
         val info: JsonObject = root.takeIf { it.isJsonObject }?.asJsonObject
             ?.get("user_info")?.takeIf { it.isJsonObject }?.asJsonObject
@@ -45,6 +46,7 @@ class XtreamClient(
         if (status != null && !status.equals("Active", ignoreCase = true)) {
             throw IOException("Account status: $status")
         }
+        return info.str("exp_date")?.toLongOrNull()?.takeIf { it > 0 }
     }
 
     fun categories(type: ContentType): List<Category> {

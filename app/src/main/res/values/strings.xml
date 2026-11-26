@@ -49,4 +49,8 @@
 
     <string name="no_episodes">No episodes found</string>
     <string name="playback_error">Playback error: %1$s</string>
+    <string name="exit">Exit</string>
+    <string name="expiry">Expires: %1$s</string>
+    <string name="unlimited">Unlimited</string>
+    <string name="preview_hint">Press OK on a channel to preview it.\nPress OK again for full screen.</string>
 </resources>

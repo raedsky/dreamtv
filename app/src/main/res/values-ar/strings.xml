@@ -49,4 +49,8 @@
 
     <string name="no_episodes">لا توجد حلقات</string>
     <string name="playback_error">خطأ في التشغيل: %1$s</string>
+    <string name="exit">خروج</string>
+    <string name="expiry">ينتهي: %1$s</string>
+    <string name="unlimited">غير محدود</string>
+    <string name="preview_hint">اضغط OK على القناة لمعاينتها.\nاضغط OK مرة ثانية لملء الشاشة.</string>
 </resources>
