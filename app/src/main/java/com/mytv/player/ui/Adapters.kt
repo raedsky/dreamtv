@@ -10,10 +10,37 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
 import com.mytv.player.R
 import com.mytv.player.data.ContentType
 import com.mytv.player.data.Episode
 import com.mytv.player.data.StreamItem
+
+/**
+ * تحميل الصور بشكل آمن داخل القوائم:
+ * - نمسح الصورة القديمة أولاً حتى لا تظهر صورة عنصر آخر
+ * - كل صورة باتصال مستقل (Connection: close) لأن بعض سيرفرات IPTV ترجع صورة خاطئة
+ *   عند طلب صور كثيرة على نفس الاتصال
+ */
+object Images {
+    fun load(view: ImageView, rawUrl: String?) {
+        val glide = Glide.with(view)
+        glide.clear(view)
+        view.setImageResource(R.drawable.ic_placeholder)
+        val url = rawUrl?.trim()?.takeIf { it.startsWith("http://", true) || it.startsWith("https://", true) }
+            ?: return
+        val model = GlideUrl(url, LazyHeaders.Builder()
+            .setHeader("User-Agent", com.mytv.player.App.USER_AGENT)
+            .setHeader("Connection", "close")
+            .build())
+        glide.load(model)
+            .placeholder(R.drawable.ic_placeholder)
+            .error(R.drawable.ic_placeholder)
+            .dontAnimate()
+            .into(view)
+    }
+}
 
 /** صف في قائمة التصنيفات الجانبية. */
 data class CategoryRow(val kind: Kind, val id: String, val name: String, val count: Int) {
@@ -119,12 +146,7 @@ class ItemAdapter(
         val item = items[position]
         h.name.text = item.name
         h.fav.isVisible = item.key in favorites()
-        Glide.with(h.image)
-            .load(item.icon?.takeIf { it.isNotBlank() })
-            .placeholder(R.drawable.ic_placeholder)
-            .error(R.drawable.ic_placeholder)
-            .fallback(R.drawable.ic_placeholder)
-            .into(h.image)
+        Images.load(h.image, item.icon)
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) onClick(items[pos], pos)

@@ -47,8 +47,7 @@ class SeriesDetailActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<TextView>(R.id.tvTitle).text = item.name
-        Glide.with(this).load(item.icon).placeholder(R.drawable.ic_placeholder)
-            .error(R.drawable.ic_placeholder).into(findViewById<ImageView>(R.id.ivCover))
+        Images.load(findViewById<ImageView>(R.id.ivCover), item.icon)
 
         val progress = findViewById<ProgressBar>(R.id.progress)
         val tvEmpty = findViewById<TextView>(R.id.tvEmpty)
