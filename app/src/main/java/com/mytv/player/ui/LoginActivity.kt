@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -72,7 +74,25 @@ class LoginActivity : AppCompatActivity() {
         }
         updateMode()
 
+        // في أجهزة البوكس: الضغط على OK فوق الخانة يفتح الكيبورد
+        for (et in listOf(etServer, etUser, etPass, etM3u)) {
+            et.setOnClickListener { showKeyboard(it as EditText) }
+        }
+        etPass.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) { connect(); true } else false
+        }
+        etM3u.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) { connect(); true } else false
+        }
+
         btnConnect.setOnClickListener { connect() }
+    }
+
+    private fun showKeyboard(et: EditText) {
+        et.requestFocus()
+        et.setSelection(et.text.length)
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun updateMode() {
