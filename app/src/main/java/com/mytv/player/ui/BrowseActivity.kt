@@ -83,6 +83,7 @@ class BrowseActivity : AppCompatActivity() {
                 ContentType.SERIES -> R.string.series
             }
         )
+        findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         rvCategories = findViewById(R.id.rvCategories)
         rvItems = findViewById(R.id.rvItems)
         etSearch = findViewById(R.id.etSearch)

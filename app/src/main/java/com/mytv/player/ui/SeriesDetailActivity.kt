@@ -33,6 +33,7 @@ class SeriesDetailActivity : AppCompatActivity() {
         val item = pending ?: run { finish(); return }
         setContentView(R.layout.activity_series_detail)
 
+        findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<TextView>(R.id.tvTitle).text = item.name
         Glide.with(this).load(item.icon).placeholder(R.drawable.ic_placeholder)
             .error(R.drawable.ic_placeholder).into(findViewById<ImageView>(R.id.ivCover))
