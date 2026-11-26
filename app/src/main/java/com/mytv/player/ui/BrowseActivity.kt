@@ -309,6 +309,8 @@ class BrowseActivity : AppCompatActivity() {
             getString(R.string.add_to_group)
         )
         if (inGroup != null) labels += getString(R.string.remove_from_group, inGroup.name)
+        val infoIndex = labels.size
+        labels += getString(R.string.image_info)
 
         AlertDialog.Builder(this)
             .setTitle(item.name)
@@ -319,12 +321,34 @@ class BrowseActivity : AppCompatActivity() {
                         refresh(reloadItems = current?.kind == Kind.FAVORITES)
                     }
                     1 -> chooseGroups(item)
+                    infoIndex -> showImageInfo(item)
                     2 -> if (inGroup != null) {
                         app.groups.setMember(type, inGroup.id, item.key, false)
                         refresh(reloadItems = true)
                     }
                 }
             }
+            .show()
+    }
+
+    /** يعرض رابط صورة العنصر (لتشخيص مشاكل الصور) مع زر نسخ. */
+    private fun showImageInfo(item: StreamItem) {
+        val p = app.prefs.profile
+        // نخفي اسم المستخدم وكلمة المرور إن ظهرت في الرابط
+        var url = item.icon ?: "-"
+        if (p != null && p.username.isNotEmpty()) url = url.replace(p.username, "***")
+        if (p != null && p.password.isNotEmpty()) url = url.replace(p.password, "***")
+        val sameCount = content?.items?.count { it.icon != null && it.icon == item.icon } ?: 0
+        val text = "${item.name}\n\n$url\n\n" + getString(R.string.same_image_count, sameCount)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.image_info)
+            .setMessage(text)
+            .setPositiveButton(R.string.copy) { _, _ ->
+                val cm = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("image", text))
+                Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 

@@ -17,7 +17,8 @@ import com.mytv.player.data.StreamItem
 /**
  * محمّل صور خاص (بدل Glide):
  * - كل صورة مرتبطة بخانتها؛ إذا تغيّرت الخانة (تمرير/تغيير قسم) لا تُوضع فيها صورة قديمة
- * - 3 تحميلات بالتوازي فقط، وكل طلب باتصال مستقل
+ * - 3 تحميلات بالتوازي فقط
+ * - الأحدث أولاً: الصور الظاهرة على الشاشة تتحمّل قبل التي تم تجاوزها بالتمرير
  * - ذاكرة مؤقتة في الرام + على القرص
  */
 object Images {
@@ -27,11 +28,16 @@ object Images {
     ) {
         override fun sizeOf(key: String, value: android.graphics.Bitmap) = value.byteCount
     }
-    private val exec = java.util.concurrent.Executors.newFixedThreadPool(3)
+    private val exec = java.util.concurrent.ThreadPoolExecutor(
+        3, 3, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+        object : java.util.concurrent.LinkedBlockingDeque<Runnable>() {
+            override fun offer(e: Runnable): Boolean = offerFirst(e)   // LIFO
+        }
+    )
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
     private val client by lazy {
         com.mytv.player.App.http.newBuilder()
-            .cache(okhttp3.Cache(java.io.File(com.mytv.player.App.instance.cacheDir, "images"), 60L * 1024 * 1024))
+            .cache(okhttp3.Cache(java.io.File(com.mytv.player.App.instance.cacheDir, "images_v2"), 60L * 1024 * 1024))
             .build()
     }
 

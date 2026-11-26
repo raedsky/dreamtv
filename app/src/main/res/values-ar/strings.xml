@@ -80,4 +80,8 @@
     <string name="sort_default">الافتراضي</string>
     <string name="sort_added">حسب الإضافة</string>
     <string name="sort_name">حسب الاسم</string>
+    <string name="image_info">معلومات الصورة</string>
+    <string name="same_image_count">عدد العناصر التي تستخدم نفس رابط الصورة: %1$d</string>
+    <string name="copy">نسخ</string>
+    <string name="copied">تم النسخ</string>
 </resources>

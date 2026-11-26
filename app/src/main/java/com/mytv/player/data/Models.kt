@@ -62,3 +62,23 @@ internal fun JsonObject.str(name: String): String? {
     if (e.isJsonNull) return null
     return if (e.isJsonPrimitive) e.asString else e.toString()
 }
+
+/**
+ * أغلب روابط M3U تأتي من سيرفرات Xtream بهذا الشكل:
+ *   http://host:port/get.php?username=USER&password=PASS&type=m3u_plus
+ * نستخرج منها بيانات Xtream لنحصل على مكتبة مرتبة (صور المسلسلات الصحيحة، المواسم، تاريخ الإضافة).
+ */
+fun xtreamFromM3u(url: String): Triple<String, String, String>? {
+    val u = runCatching { java.net.URI(url.trim()) }.getOrNull() ?: return null
+    if (u.path?.endsWith("get.php", ignoreCase = true) != true) return null
+    val host = u.host ?: return null
+    val params = (u.rawQuery ?: return null).split('&').mapNotNull {
+        val i = it.indexOf('=')
+        if (i <= 0) null
+        else it.substring(0, i).lowercase() to runCatching { java.net.URLDecoder.decode(it.substring(i + 1), "UTF-8") }.getOrDefault(it.substring(i + 1))
+    }.toMap()
+    val user = params["username"]?.takeIf { it.isNotEmpty() } ?: return null
+    val pass = params["password"]?.takeIf { it.isNotEmpty() } ?: return null
+    val port = if (u.port > 0) ":${u.port}" else ""
+    return Triple("${u.scheme ?: "http"}://$host$port", user, pass)
+}

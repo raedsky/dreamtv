@@ -36,6 +36,11 @@ class Repository(private val prefs: Prefs) {
     private val m3uEpisodes = HashMap<String, List<Episode>>()
     private val mutex = Mutex()
 
+    private fun asXtream(p: Profile): Profile? {
+        val (server, user, pass) = xtreamFromM3u(p.m3uUrl) ?: return null
+        return p.copy(kind = Profile.XTREAM, server = server, username = user, password = pass)
+    }
+
     private fun xtream(p: Profile) = XtreamClient(App.http, p.server, p.username, p.password, prefs.liveFormat)
 
     /** يتحقق من الاشتراك قبل حفظه. */
@@ -44,6 +49,12 @@ class Repository(private val prefs: Prefs) {
         mutex.withLock {
             cache.clear()
             m3u = null
+            // رابط M3U من سيرفر Xtream؟ نتحول لاتصال Xtream (مكتبة مرتبة)
+            val converted = if (p.kind == Profile.M3U) asXtream(p) else null
+            if (converted != null) {
+                runCatching { converted.copy(expiry = xtream(converted).authenticate()) }.getOrNull()
+                    ?.let { return@withLock it }
+            }
             if (p.kind == Profile.XTREAM) {
                 p.copy(expiry = xtream(p).authenticate())
             } else {
@@ -125,7 +136,10 @@ class Repository(private val prefs: Prefs) {
         val items = ArrayList<StreamItem>()
         for ((key, a) in series) {
             m3uEpisodes[key] = a.eps.sortedWith(compareBy({ it.season }, { it.number }))
-            items += StreamItem(key, key, a.name, a.logo, a.group, ContentType.SERIES, null)
+            // صورة المسلسل = الصورة المتكررة أكثر بين حلقاته (غالباً البوستر الحقيقي)
+            val poster = a.eps.mapNotNull { it.icon?.takeIf { u -> u.isNotBlank() } }
+                .groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: a.logo
+            items += StreamItem(key, key, a.name, poster, a.group, ContentType.SERIES, null)
         }
         items += singles
         return Content(cats.values.toList(), items)
