@@ -227,6 +227,10 @@ class BrowseActivity : AppCompatActivity() {
             R.id.tabSeries to ContentType.SERIES
         )
         findViewById<View>(R.id.tabHome).setOnClickListener { finish() }
+        findViewById<View>(R.id.btnRefresh).setOnClickListener {
+            Toast.makeText(this, R.string.refreshing, Toast.LENGTH_SHORT).show()
+            load(force = true)
+        }
         for ((id, t) in tabs) {
             val tab = findViewById<TextView>(id)
             if (t == type) {
@@ -533,8 +537,10 @@ class BrowseActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        // البيانات أقدم من 15 دقيقة؟ نجلب الجديد من السيرفر (أفلام/مسلسلات مضافة حديثاً)
+        if (content != null && app.repo.isStale(type)) load(force = false)
         // تحديث عدّاد "المشاهدات الأخيرة" بعد الرجوع من التشغيل
-        if (content != null) refresh(reloadItems = current?.kind == Kind.RECENT)
+        else if (content != null) refresh(reloadItems = current?.kind == Kind.RECENT)
         // الرجوع من ملء الشاشة: نكمل المعاينة على نفس القناة
         if (type == ContentType.LIVE) previewItem?.let { startPreview(it) }
     }

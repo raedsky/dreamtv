@@ -25,12 +25,20 @@ internal fun parseEpisode(title: String): Triple<String, Int, Int>? {
 }
 
 private const val M3U_SERIES = "MS:"
+/** مدة التحديث التلقائي: 15 دقيقة */
+private const val CACHE_TTL = 15 * 60 * 1000L
 
 class Repository(private val prefs: Prefs) {
 
     data class Content(val categories: List<Category>, val items: List<StreamItem>)
 
     private val cache = HashMap<ContentType, Content>()
+    /** وقت آخر تحميل لكل قسم — البيانات تتجدد تلقائياً بعد CACHE_TTL */
+    private val loadedAt = HashMap<ContentType, Long>()
+
+    /** هل بيانات القسم أقدم من مدة التحديث التلقائي؟ */
+    fun isStale(type: ContentType): Boolean =
+        System.currentTimeMillis() - (loadedAt[type] ?: 0L) > CACHE_TTL
     private var m3u: List<M3uEntry>? = null
     /** حلقات مسلسلات M3U بعد تجميعها: مفتاح المسلسل ← الحلقات */
     private val m3uEpisodes = HashMap<String, List<Episode>>()
@@ -68,15 +76,17 @@ class Repository(private val prefs: Prefs) {
 
     suspend fun load(type: ContentType, force: Boolean = false): Content = withContext(Dispatchers.IO) {
         mutex.withLock {
-            if (!force) cache[type]?.let { return@withLock it }
+            val stale = isStale(type)
+            if (!force && !stale) cache[type]?.let { return@withLock it }
             val p = prefs.profile ?: throw IOException("Not logged in")
             val content = if (p.kind == Profile.XTREAM) {
                 val x = xtream(p)
                 Content(x.categories(type), x.streams(type))
             } else {
-                loadM3u(p, type, force)
+                loadM3u(p, type, force || stale)
             }
             cache[type] = content
+            loadedAt[type] = System.currentTimeMillis()
             content
         }
     }
@@ -94,6 +104,7 @@ class Repository(private val prefs: Prefs) {
 
     fun clear() {
         cache.clear()
+        loadedAt.clear()
         m3u = null
         m3uEpisodes.clear()
     }
