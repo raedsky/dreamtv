@@ -75,4 +75,9 @@
     <string name="off">إيقاف</string>
     <string name="season">الموسم %1$d</string>
     <string name="episodes">الحلقات</string>
+    <string name="sort">الترتيب</string>
+    <string name="sort_by">ترتيب: %1$s</string>
+    <string name="sort_default">الافتراضي</string>
+    <string name="sort_added">حسب الإضافة</string>
+    <string name="sort_name">حسب الاسم</string>
 </resources>

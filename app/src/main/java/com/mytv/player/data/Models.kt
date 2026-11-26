@@ -18,7 +18,9 @@ data class StreamItem(
     val icon: String?,
     val categoryId: String,
     val type: ContentType,
-    val url: String?
+    val url: String?,
+    /** وقت الإضافة (ثواني Unix) للترتيب حسب الأحدث — 0 إذا غير معروف */
+    val added: Long = 0
 )
 
 data class Episode(

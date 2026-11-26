@@ -79,17 +79,18 @@ class XtreamClient(
                 ContentType.LIVE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null
                     StreamItem("L:$id", id, name, o.str("stream_icon"), cat, type,
-                        "$base/live/$user/$pass/$id.$liveExt")
+                        "$base/live/$user/$pass/$id.$liveExt", o.str("added")?.toLongOrNull() ?: 0)
                 }
                 ContentType.MOVIE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null
                     val ext = o.str("container_extension")?.takeIf { it.isNotBlank() } ?: "mp4"
                     StreamItem("M:$id", id, name, o.str("stream_icon"), cat, type,
-                        "$base/movie/$user/$pass/$id.$ext")
+                        "$base/movie/$user/$pass/$id.$ext", o.str("added")?.toLongOrNull() ?: 0)
                 }
                 ContentType.SERIES -> {
                     val id = o.str("series_id") ?: return@mapNotNull null
-                    StreamItem("S:$id", id, name, o.str("cover"), cat, type, null)
+                    StreamItem("S:$id", id, name, o.str("cover"), cat, type, null,
+                        o.str("last_modified")?.toLongOrNull() ?: 0)
                 }
             }
         }

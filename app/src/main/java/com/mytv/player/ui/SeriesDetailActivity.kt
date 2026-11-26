@@ -14,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.mytv.player.App
 import com.mytv.player.R
 import com.mytv.player.data.Episode

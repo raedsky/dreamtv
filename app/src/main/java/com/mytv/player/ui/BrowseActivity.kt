@@ -54,6 +54,7 @@ class BrowseActivity : AppCompatActivity() {
     private lateinit var etSearch: EditText
     private lateinit var tvEmpty: TextView
     private lateinit var tvHeader: TextView
+    private lateinit var btnSort: TextView
     private lateinit var progress: ProgressBar
 
     private var content: Repository.Content? = null
@@ -89,6 +90,9 @@ class BrowseActivity : AppCompatActivity() {
         etSearch = findViewById(R.id.etSearch)
         tvEmpty = findViewById(R.id.tvEmpty)
         tvHeader = findViewById(R.id.tvHeader)
+        btnSort = findViewById(R.id.btnSort)
+        btnSort.setOnClickListener { chooseSort() }
+        updateSortLabel()
         progress = findViewById(R.id.progress)
 
         catAdapter = CategoryAdapter(::onCategoryClick, ::onCategoryLongClick)
@@ -163,7 +167,7 @@ class BrowseActivity : AppCompatActivity() {
         val changed = sel.key != current?.key
         current = sel
         catAdapter.setSelected(sel)
-        tvHeader.text = sel.name
+        tvHeader.text = "${sel.name} (${itemAdapter.itemCount})"
         if (reloadItems || changed) {
             currentItems = itemsFor(sel)
             applyFilter()
@@ -186,9 +190,18 @@ class BrowseActivity : AppCompatActivity() {
 
     private fun applyFilter() {
         val q = etSearch.text.toString().trim()
-        val list = if (q.isEmpty()) currentItems
+        var list = if (q.isEmpty()) currentItems
                    else currentItems.filter { it.name.contains(q, ignoreCase = true) }
+        // القروبات والمفضلة تبقى بترتيب المستخدم
+        if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES) {
+            list = when (app.prefs.sortMode) {
+                "added" -> list.sortedByDescending { it.added }
+                "name" -> list.sortedBy { it.name.lowercase() }
+                else -> list
+            }
+        }
         itemAdapter.submit(list)
+        tvHeader.text = "${current?.name.orEmpty()} (${list.size})"
         rvItems.scrollToPosition(0)
         val emptyMsg = when {
             list.isNotEmpty() -> null
@@ -197,6 +210,32 @@ class BrowseActivity : AppCompatActivity() {
         }
         tvEmpty.text = emptyMsg
         tvEmpty.isVisible = emptyMsg != null
+    }
+
+    // ---------------- الترتيب ----------------
+
+    private fun sortLabel(mode: String) = getString(when (mode) {
+        "added" -> R.string.sort_added
+        "name" -> R.string.sort_name
+        else -> R.string.sort_default
+    })
+
+    private fun updateSortLabel() {
+        btnSort.text = getString(R.string.sort_by, sortLabel(app.prefs.sortMode))
+    }
+
+    private fun chooseSort() {
+        val modes = arrayOf("default", "added", "name")
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sort)
+            .setSingleChoiceItems(modes.map { sortLabel(it) }.toTypedArray(),
+                modes.indexOf(app.prefs.sortMode).coerceAtLeast(0)) { d, which ->
+                app.prefs.sortMode = modes[which]
+                updateSortLabel()
+                applyFilter()
+                d.dismiss()
+            }
+            .show()
     }
 
     // ---------------- التصنيفات والقروبات ----------------
@@ -243,7 +282,7 @@ class BrowseActivity : AppCompatActivity() {
                         app.groups.rename(type, row.id, name)
                         if (current?.key == row.key) current = row.copy(name = name)
                         refresh(reloadItems = false)
-                        tvHeader.text = current?.name
+                        tvHeader.text = "${current?.name.orEmpty()} (${itemAdapter.itemCount})"
                     }
                 } else {
                     AlertDialog.Builder(this)

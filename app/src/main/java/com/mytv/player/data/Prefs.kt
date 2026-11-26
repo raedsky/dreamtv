@@ -76,6 +76,11 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("sd_only", false)
         set(v) { sp.edit().putBoolean("sd_only", v).apply() }
 
+    /** ترتيب العناصر: "default" (ترتيب السيرفر) أو "added" (الأحدث) أو "name" (أبجدي) */
+    var sortMode: String
+        get() = sp.getString("sort", "default") ?: "default"
+        set(v) { sp.edit().putString("sort", v).apply() }
+
     companion object {
         const val PLAYER_INTERNAL = "internal"
         const val PLAYER_EXTERNAL = "external"

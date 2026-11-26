@@ -75,4 +75,9 @@
     <string name="off">Off</string>
     <string name="season">Season %1$d</string>
     <string name="episodes">Episodes</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort: %1$s</string>
+    <string name="sort_default">Default</string>
+    <string name="sort_added">Newest added</string>
+    <string name="sort_name">Name (A–Z)</string>
 </resources>

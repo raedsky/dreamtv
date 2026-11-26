@@ -9,36 +9,62 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
 import com.mytv.player.R
 import com.mytv.player.data.ContentType
 import com.mytv.player.data.Episode
 import com.mytv.player.data.StreamItem
 
 /**
- * تحميل الصور بشكل آمن داخل القوائم:
- * - نمسح الصورة القديمة أولاً حتى لا تظهر صورة عنصر آخر
- * - كل صورة باتصال مستقل (Connection: close) لأن بعض سيرفرات IPTV ترجع صورة خاطئة
- *   عند طلب صور كثيرة على نفس الاتصال
+ * محمّل صور خاص (بدل Glide):
+ * - كل صورة مرتبطة بخانتها؛ إذا تغيّرت الخانة (تمرير/تغيير قسم) لا تُوضع فيها صورة قديمة
+ * - 3 تحميلات بالتوازي فقط، وكل طلب باتصال مستقل
+ * - ذاكرة مؤقتة في الرام + على القرص
  */
 object Images {
+    private const val MAX_SIZE = 320
+    private val mem = object : android.util.LruCache<String, android.graphics.Bitmap>(
+        (Runtime.getRuntime().maxMemory() / 8).toInt()
+    ) {
+        override fun sizeOf(key: String, value: android.graphics.Bitmap) = value.byteCount
+    }
+    private val exec = java.util.concurrent.Executors.newFixedThreadPool(3)
+    private val main = android.os.Handler(android.os.Looper.getMainLooper())
+    private val client by lazy {
+        com.mytv.player.App.http.newBuilder()
+            .cache(okhttp3.Cache(java.io.File(com.mytv.player.App.instance.cacheDir, "images"), 60L * 1024 * 1024))
+            .build()
+    }
+
     fun load(view: ImageView, rawUrl: String?) {
-        val glide = Glide.with(view)
-        glide.clear(view)
-        view.setImageResource(R.drawable.ic_placeholder)
         val url = rawUrl?.trim()?.takeIf { it.startsWith("http://", true) || it.startsWith("https://", true) }
-            ?: return
-        val model = GlideUrl(url, LazyHeaders.Builder()
-            .setHeader("User-Agent", com.mytv.player.App.USER_AGENT)
-            .setHeader("Connection", "close")
-            .build())
-        glide.load(model)
-            .placeholder(R.drawable.ic_placeholder)
-            .error(R.drawable.ic_placeholder)
-            .dontAnimate()
-            .into(view)
+        view.setTag(R.id.image_url, url)
+        if (url == null) { view.setImageResource(R.drawable.ic_placeholder); return }
+        mem.get(url)?.let { view.setImageBitmap(it); return }
+        view.setImageResource(R.drawable.ic_placeholder)
+        exec.execute {
+            // الخانة صارت لعنصر آخر قبل أن يبدأ التحميل؟ نتجاهل
+            if (view.getTag(R.id.image_url) != url) return@execute
+            val bmp = runCatching { fetch(url) }.getOrNull() ?: return@execute
+            mem.put(url, bmp)
+            main.post { if (view.getTag(R.id.image_url) == url) view.setImageBitmap(bmp) }
+        }
+    }
+
+    private fun fetch(url: String): android.graphics.Bitmap? {
+        val req = okhttp3.Request.Builder().url(url).header("Connection", "close").build()
+        val bytes = client.newCall(req).execute().use { r ->
+            if (!r.isSuccessful) return null
+            r.body?.bytes()
+        } ?: return null
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+        var sample = 1
+        while (bounds.outWidth / (sample * 2) >= MAX_SIZE && bounds.outHeight / (sample * 2) >= MAX_SIZE) sample *= 2
+        val opts = android.graphics.BitmapFactory.Options().apply {
+            inSampleSize = sample
+            inPreferredConfig = android.graphics.Bitmap.Config.RGB_565
+        }
+        return android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
     }
 }
 
