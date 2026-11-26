@@ -43,11 +43,16 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <EditText android:id="@+id/etServer" style="@style/Field"
-                    android:hint="@string/server" android:inputType="textUri" />
+                    android:hint="@string/server" android:inputType="textUri"
+                    android:imeOptions="actionNext" android:nextFocusDown="@+id/etUser" />
                 <EditText android:id="@+id/etUser" style="@style/Field"
-                    android:hint="@string/username" android:inputType="text" />
+                    android:hint="@string/username"
+                    android:inputType="textVisiblePassword|textNoSuggestions"
+                    android:importantForAutofill="no"
+                    android:imeOptions="actionNext" android:nextFocusDown="@+id/etPass" />
                 <EditText android:id="@+id/etPass" style="@style/Field"
-                    android:hint="@string/password" android:inputType="textPassword" />
+                    android:hint="@string/password" android:inputType="textPassword"
+                    android:imeOptions="actionDone" android:nextFocusDown="@+id/btnConnect" />
             </LinearLayout>
 
             <LinearLayout
@@ -55,7 +60,8 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:visibility="gone">
                 <EditText android:id="@+id/etM3u" style="@style/Field"
-                    android:hint="@string/m3u_url" android:inputType="textUri" />
+                    android:hint="@string/m3u_url" android:inputType="textUri"
+                    android:imeOptions="actionDone" android:nextFocusDown="@+id/btnConnect" />
             </LinearLayout>
 
             <TextView
