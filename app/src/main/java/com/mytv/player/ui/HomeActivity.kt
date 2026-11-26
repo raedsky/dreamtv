@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.mytv.player.App
 import com.mytv.player.R
+import com.mytv.player.PanelConfig
 import com.mytv.player.data.ContentType
+import com.mytv.player.data.Panel
 import com.mytv.player.data.Prefs
 import com.mytv.player.data.Profile
 import com.mytv.player.data.Weather
@@ -57,6 +59,50 @@ class HomeActivity : AppCompatActivity() {
         super.onResume()
         refreshInfo()
         loadWeather()
+        syncPanel()
+    }
+
+    // ---------------- لوحة التحكم ----------------
+
+    private fun syncPanel() {
+        if (!PanelConfig.enabled) return
+        lifecycleScope.launch {
+            val st = Panel.sync(this@HomeActivity) ?: Panel.cached() ?: return@launch
+            val device = st.device ?: return@launch
+            if (!device.allowed) {
+                ActivationActivity.start(this@HomeActivity, device.status)
+                finish()
+                return@launch
+            }
+            // قوائم التشغيل المضافة من اللوحة لهذا الجهاز
+            st.playlists?.let { pls ->
+                if (app.prefs.syncPanelPlaylists(Panel.toProfiles(pls))) app.repo.clear()
+            }
+            // تاريخ انتهاء اشتراك Xtream للقوائم القادمة من اللوحة
+            app.prefs.profile?.takeIf {
+                it.id.startsWith("panel:") && it.kind == Profile.XTREAM && it.expiry == null && expiryChecked.add(it.id)
+            }?.let { p -> app.repo.fetchExpiry(p)?.let { app.prefs.saveProfile(p.copy(expiry = it)) } }
+            panelDevice = device
+            refreshInfo()
+            // رسالة المدير (مرة واحدة لكل رسالة)
+            st.message?.let { m ->
+                if (m.id > app.prefs.seenMessageId && !m.body.isNullOrBlank()) {
+                    app.prefs.seenMessageId = m.id
+                    AlertDialog.Builder(this@HomeActivity)
+                        .setTitle(m.title?.takeIf { it.isNotBlank() } ?: getString(R.string.message))
+                        .setMessage(m.body)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
+                }
+            }
+        }
+    }
+
+    private var panelDevice: com.mytv.player.data.PanelDevice? = null
+
+    companion object {
+        /** قوائم تم فحص تاريخ انتهائها في هذه الجلسة */
+        private val expiryChecked = mutableSetOf<String>()
     }
 
     private fun openSection(type: ContentType) {
@@ -73,18 +119,28 @@ class HomeActivity : AppCompatActivity() {
         val tvAccount = findViewById<TextView>(R.id.tvAccount)
         val tvExpiry = findViewById<TextView>(R.id.tvExpiry)
         if (p == null) {
-            tvAccount.setText(R.string.no_playlist)
+            tvAccount.text = getString(R.string.no_playlist) + deviceLine()
             tvExpiry.text = getString(R.string.expiry, "—")
             return
         }
         val user = if (p.kind == Profile.XTREAM) "  •  ${p.username}" else ""
-        tvAccount.text = getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) }) + user
+        tvAccount.text = getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) }) + user + deviceLine()
         tvExpiry.text = if (p.kind == Profile.XTREAM) {
             val exp = p.expiry
             val text = if (exp != null) DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))
                        else getString(R.string.unlimited)
             getString(R.string.expiry, text)
         } else getString(R.string.expiry, "—")
+    }
+
+    /** "MAC: ...  •  مفعّل حتى ..." عند ربط اللوحة */
+    private fun deviceLine(): String {
+        if (!PanelConfig.enabled) return ""
+        val mac = Panel.deviceIds(this).first
+        val exp = panelDevice?.expires_at
+        val until = if (exp != null) "  •  " + getString(R.string.device_until,
+            DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))) else ""
+        return "\nMAC: $mac$until"
     }
 
     private fun loadWeather() {

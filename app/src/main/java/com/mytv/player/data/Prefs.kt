@@ -76,6 +76,37 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("sd_only", false)
         set(v) { sp.edit().putBoolean("sd_only", v).apply() }
 
+    // ---------------- لوحة التحكم ----------------
+
+    /** آخر رد من اللوحة (JSON) للعمل بدون إنترنت */
+    var panelCache: String?
+        get() = sp.getString("panel_cache", null)
+        set(v) { sp.edit().putString("panel_cache", v).apply() }
+
+    /** آخر رسالة من اللوحة رآها المستخدم */
+    var seenMessageId: Long
+        get() = sp.getLong("seen_msg", 0L)
+        set(v) { sp.edit().putLong("seen_msg", v).apply() }
+
+    /**
+     * يدمج قوائم اللوحة مع قوائم المستخدم: يضيف الجديدة، يحدّث الموجودة، ويحذف التي أزالها المدير.
+     * يرجع true إذا تغيّرت القائمة النشطة.
+     */
+    fun syncPanelPlaylists(panel: List<Profile>): Boolean {
+        val before = profile?.id
+        val beforeActive = profile
+        val list = profiles()
+        val panelIds = panel.map { it.id }.toSet()
+        list.removeAll { it.id.startsWith("panel:") && it.id !in panelIds }
+        for (p in panel) {
+            val i = list.indexOfFirst { it.id == p.id }
+            if (i >= 0) list[i] = p.copy(expiry = list[i].expiry) else list += p
+        }
+        saveAll(list)
+        val after = profile
+        return before != after?.id || beforeActive != after
+    }
+
     /** ترتيب العناصر: "default" (ترتيب السيرفر) أو "added" (الأحدث) أو "name" (أبجدي) */
     var sortMode: String
         get() = sp.getString("sort", "default") ?: "default"

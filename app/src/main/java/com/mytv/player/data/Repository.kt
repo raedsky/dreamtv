@@ -87,6 +87,11 @@ class Repository(private val prefs: Prefs) {
         xtream(p).seriesEpisodes(item.id)
     }
 
+    /** تاريخ انتهاء اشتراك Xtream بدون مسح البيانات المحمّلة. */
+    suspend fun fetchExpiry(p: Profile): Long? = withContext(Dispatchers.IO) {
+        runCatching { xtream(p).authenticate() }.getOrNull()
+    }
+
     fun clear() {
         cache.clear()
         m3u = null

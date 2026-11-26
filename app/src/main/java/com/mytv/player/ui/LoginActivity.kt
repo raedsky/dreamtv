@@ -33,6 +33,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private var editingId: String? = null
+    private lateinit var spDns: android.widget.Spinner
+    /** سيرفرات DNS من لوحة التحكم (إن وُجدت) */
+    private var dnsList: List<com.mytv.player.data.PanelDns> = emptyList()
 
     private lateinit var etName: EditText
     private lateinit var rbXtream: RadioButton
@@ -64,6 +67,8 @@ class LoginActivity : AppCompatActivity() {
         progress = findViewById(R.id.progress)
         tvError = findViewById(R.id.tvError)
 
+        spDns = findViewById(R.id.spDns)
+        setupDns()
         rbXtream.setOnCheckedChangeListener { _, _ -> updateMode() }
         rbM3u.setOnCheckedChangeListener { _, _ -> updateMode() }
 
@@ -73,6 +78,8 @@ class LoginActivity : AppCompatActivity() {
                 etName.setText(p.name)
                 if (p.kind == Profile.M3U) rbM3u.isChecked = true else rbXtream.isChecked = true
                 etServer.setText(p.server)
+                val i = dnsList.indexOfFirst { d -> d.url?.trimEnd('/') == p.server.trimEnd('/') }
+                if (i >= 0) spDns.setSelection(i)
                 etUser.setText(p.username)
                 etPass.setText(p.password)
                 etM3u.setText(p.m3uUrl)
@@ -106,10 +113,32 @@ class LoginActivity : AppCompatActivity() {
         m3uFields.isVisible = rbM3u.isChecked
     }
 
+    /** إذا أضاف المدير سيرفرات في اللوحة: قائمة اختيار بدل كتابة الرابط. */
+    private fun setupDns() {
+        dnsList = com.mytv.player.data.Panel.cached()?.dns.orEmpty().filter { !it.url.isNullOrBlank() }
+        if (dnsList.isEmpty()) return
+        val names = dnsList.map { it.name?.takeIf { n -> n.isNotBlank() } ?: it.url.orEmpty() } +
+            getString(R.string.other_server)
+        spDns.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, names)
+        spDns.isVisible = true
+        spDns.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, pos: Int, id: Long) {
+                etServer.isVisible = pos >= dnsList.size   // "سيرفر آخر" يظهر خانة الرابط
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+    }
+
+    private fun selectedServer(): String {
+        val pos = spDns.selectedItemPosition
+        return if (spDns.isVisible && pos in dnsList.indices) dnsList[pos].url.orEmpty()
+               else etServer.text.toString().trim()
+    }
+
     private fun connect() {
         val id = editingId ?: UUID.randomUUID().toString()
         var profile = if (rbXtream.isChecked) {
-            val server = etServer.text.toString().trim()
+            val server = selectedServer()
             val user = etUser.text.toString().trim()
             val pass = etPass.text.toString().trim()
             if (server.isEmpty() || user.isEmpty() || pass.isEmpty()) {

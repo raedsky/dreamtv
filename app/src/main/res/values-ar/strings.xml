@@ -95,4 +95,15 @@
     <string name="movies_sub">تصفّح كل الأفلام</string>
     <string name="series_sub">تصفّح كل المسلسلات</string>
     <string name="today">اليوم</string>
+    <string name="message">رسالة</string>
+    <string name="device_until">مفعّل حتى %1$s</string>
+    <string name="status_pending">هذا الجهاز غير مفعّل بعد</string>
+    <string name="status_blocked">تم إيقاف هذا الجهاز</string>
+    <string name="status_expired">انتهى اشتراك هذا الجهاز</string>
+    <string name="activation_hint">أرسل الرمز التالي لمزوّد الخدمة لتفعيل التطبيق.</string>
+    <string name="check_again">تحقق مرة أخرى</string>
+    <string name="panel_unreachable">تعذّر الاتصال بالسيرفر، تأكد من الإنترنت.</string>
+    <string name="still_not_active">ما زال الجهاز غير مفعّل</string>
+    <string name="other_server">سيرفر آخر (اكتب الرابط)…</string>
+    <string name="server_label">السيرفر</string>
 </resources>

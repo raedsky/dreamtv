@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <com.mytv.player.ui.StreaksView
+        android:layout_width="match_parent" android:layout_height="match_parent" />
+
+    <ScrollView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center" android:orientation="vertical" android:padding="32dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:minWidth="420dp"
+                android:background="@drawable/bg_glass"
+                android:gravity="center_horizontal" android:orientation="vertical"
+                android:padding="32dp">
+                <ImageView
+                    android:layout_width="72dp" android:layout_height="72dp"
+                    android:src="@drawable/ic_launcher" />
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" android:gravity="center"
+                    android:textColor="@color/text_primary" android:textSize="24sp" android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvHint"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:gravity="center"
+                    android:text="@string/activation_hint"
+                    android:textColor="@color/text_secondary" android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="MAC" android:textColor="@color/text_secondary" android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/tvMac"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="monospace" android:textDirection="ltr"
+                    android:textColor="#FFC4B5FD" android:textSize="32sp" android:textStyle="bold"
+                    android:textIsSelectable="true" />
+                <LinearLayout
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp" android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/btnRetry"
+                        android:layout_width="wrap_content" android:layout_height="56dp"
+                        android:minWidth="160dp" android:text="@string/check_again" />
+                    <Button
+                        android:id="@+id/btnExit"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content" android:layout_height="56dp"
+                        android:layout_marginStart="12dp"
+                        android:minWidth="120dp" android:text="@string/exit" />
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progress"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

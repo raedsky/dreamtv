@@ -95,4 +95,15 @@
     <string name="movies_sub">Browse all movies</string>
     <string name="series_sub">Browse all series</string>
     <string name="today">Today</string>
+    <string name="message">Message</string>
+    <string name="device_until">Active until %1$s</string>
+    <string name="status_pending">This device is not activated yet</string>
+    <string name="status_blocked">This device has been suspended</string>
+    <string name="status_expired">This device\'s subscription has expired</string>
+    <string name="activation_hint">Send the code below to your provider to activate the app.</string>
+    <string name="check_again">Check again</string>
+    <string name="panel_unreachable">Could not reach the server. Check your internet connection.</string>
+    <string name="still_not_active">Still not activated</string>
+    <string name="other_server">Other server (enter URL)…</string>
+    <string name="server_label">Server</string>
 </resources>
