@@ -1,5 +1,6 @@
 package com.mytv.player.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -24,9 +25,18 @@ class HomeActivity : AppCompatActivity() {
 
     private val app get() = App.instance
 
+    /** الرجوع من الإعدادات: فتح القوائم أو إعادة الرسم بعد تغيير الثيم */
+    private val settingsLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { r ->
+        if (r.resultCode == SettingsActivity.RESULT_PLAYLISTS) showPlaylists()
+    }
+    private var themeShown: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        ThemeUi.apply(findViewById(android.R.id.content))
 
         val tileLive = findViewById<View>(R.id.tileLive)
         tileLive.setOnClickListener { openSection(ContentType.LIVE) }
@@ -38,7 +48,7 @@ class HomeActivity : AppCompatActivity() {
             app.repo.clear()
             Toast.makeText(this, R.string.data_cleared, Toast.LENGTH_SHORT).show()
         }
-        findViewById<View>(R.id.btnSettings).setOnClickListener { showSettings() }
+        findViewById<View>(R.id.btnSettings).setOnClickListener { settingsLauncher.launch(Intent(this, SettingsActivity::class.java)) }
         findViewById<View>(R.id.btnExit).setOnClickListener { finishAffinity() }
         findViewById<View>(R.id.btnAccount).setOnClickListener { showAccount() }
 
@@ -46,7 +56,7 @@ class HomeActivity : AppCompatActivity() {
         for (id in intArrayOf(R.id.tileLive, R.id.tileMovies, R.id.tileSeries,
                 R.id.btnPlaylists, R.id.btnAccount, R.id.btnReload, R.id.btnSettings, R.id.btnExit)) {
             findViewById<View>(id).setOnFocusChangeListener { v, has ->
-                val s = if (has) (if (v.id == R.id.tileLive || v.id == R.id.tileMovies || v.id == R.id.tileSeries) 1.06f else 1.15f) else 1f
+                val s = if (has) (if (v.id == R.id.tileLive || v.id == R.id.tileMovies || v.id == R.id.tileSeries) 1.04f else 1.08f) else 1f
                 v.animate().scaleX(s).scaleY(s).setDuration(120).start()
             }
         }
@@ -58,6 +68,8 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (themeShown != null && themeShown != com.mytv.player.data.Themes.current.id) { recreate(); return }
+        themeShown = com.mytv.player.data.Themes.current.id
         refreshInfo()
         loadWeather()
         syncPanel()
@@ -85,6 +97,13 @@ class HomeActivity : AppCompatActivity() {
             }?.let { p -> app.repo.fetchExpiry(p)?.let { app.prefs.saveProfile(p.copy(expiry = it)) } }
             panelDevice = device
             refreshInfo()
+            // الثيم المختار من اللوحة (يُطبّق فقط عند تغييره في اللوحة)
+            val sp = getSharedPreferences("settings", MODE_PRIVATE)
+            val pt = st.theme
+            if (!pt.isNullOrBlank() && pt != sp.getString("panel_theme", null)) {
+                sp.edit().putString("panel_theme", pt).apply()
+                if (com.mytv.player.data.Themes.set(this@HomeActivity, pt)) { recreate(); return@launch }
+            }
             // رسالة المدير (مرة واحدة لكل رسالة)
             st.message?.let { m ->
                 if (m.id > app.prefs.seenMessageId && !m.body.isNullOrBlank()) {
@@ -122,17 +141,16 @@ class HomeActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvMac).text = deviceLine().trim()
         if (p == null) {
             tvAccount.text = getString(R.string.no_playlist)
-            tvExpiry.text = getString(R.string.expiry, "—")
+            setExpiry(tvExpiry, "—")
             return
         }
         val user = if (p.kind == Profile.XTREAM) "  •  ${p.username}" else ""
         tvAccount.text = getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) }) + user
-        tvExpiry.text = if (p.kind == Profile.XTREAM) {
+        setExpiry(tvExpiry, if (p.kind == Profile.XTREAM) {
             val exp = p.expiry
-            val text = if (exp != null) DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))
-                       else getString(R.string.unlimited)
-            getString(R.string.expiry, text)
-        } else getString(R.string.expiry, "—")
+            if (exp != null) DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))
+            else getString(R.string.unlimited)
+        } else "—")
     }
 
     /** "MAC: ...  •  مفعّل حتى ..." عند ربط اللوحة */
@@ -171,6 +189,16 @@ class HomeActivity : AppCompatActivity() {
             .setMessage(lines.joinToString("\n"))
             .setPositiveButton(android.R.string.ok, null)
             .show()
+    }
+
+    /** "الانتهاء: غير محدود" والقيمة بلون الثيم */
+    private fun setExpiry(tv: TextView, value: String) {
+        val full = getString(R.string.expiry, value)
+        val sp = android.text.SpannableString(full)
+        val i = full.lastIndexOf(value)
+        if (i >= 0) sp.setSpan(android.text.style.ForegroundColorSpan(com.mytv.player.data.Themes.current.accent),
+            i, i + value.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        tv.text = sp
     }
 
     private fun loadWeather() {
@@ -230,142 +258,5 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
             .show()
-    }
-
-    // ---------------- الإعدادات ----------------
-
-    private fun showSettings() {
-        val prefs = app.prefs
-        val playerName = getString(
-            if (prefs.playerMode == Prefs.PLAYER_EXTERNAL) R.string.player_external else R.string.player_internal)
-        val formatName = if (prefs.liveFormat == "m3u8") "HLS (m3u8)" else "TS"
-        val sdName = getString(if (prefs.sdOnly) R.string.on else R.string.off)
-        val items = arrayOf(
-            getString(R.string.player_setting, playerName),
-            getString(R.string.live_format, formatName),
-            getString(R.string.sd_only, sdName),
-            getString(R.string.language_setting, currentLanguageName()),
-            getString(R.string.hidden_setting)
-        )
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings)
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> choosePlayer()
-                    1 -> {
-                        prefs.liveFormat = if (prefs.liveFormat == "m3u8") "ts" else "m3u8"
-                        app.repo.clear()
-                        showSettings()
-                    }
-                    2 -> {
-                        prefs.sdOnly = !prefs.sdOnly
-                        showSettings()
-                    }
-                    3 -> chooseLanguage()
-                    4 -> chooseHiddenSection()
-                }
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    private fun choosePlayer() {
-        val prefs = app.prefs
-        val options = arrayOf(getString(R.string.player_internal), getString(R.string.player_external))
-        val checked = if (prefs.playerMode == Prefs.PLAYER_EXTERNAL) 1 else 0
-        AlertDialog.Builder(this)
-            .setTitle(R.string.choose_player)
-            .setSingleChoiceItems(options, checked) { d, which ->
-                prefs.playerMode = if (which == 1) Prefs.PLAYER_EXTERNAL else Prefs.PLAYER_INTERNAL
-                d.dismiss()
-                showSettings()
-            }
-            .show()
-    }
-
-    // ---------------- اللغة ----------------
-
-    private val languages = listOf(
-        "" to null, "en" to "English", "ar" to "العربية", "fr" to "Français",
-        "tr" to "Türkçe", "es" to "Español"
-    )
-
-    private fun currentLanguageName(): String {
-        val tag = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags()
-            .substringBefore(',').substringBefore('-')
-        return languages.firstOrNull { it.first == tag && tag.isNotEmpty() }?.second ?: getString(R.string.language_system)
-    }
-
-    private fun chooseLanguage() {
-        val tag = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags()
-            .substringBefore(',').substringBefore('-')
-        val names = languages.map { it.second ?: getString(R.string.language_system) }.toTypedArray()
-        val checked = languages.indexOfFirst { it.first == tag }.coerceAtLeast(0)
-        AlertDialog.Builder(this)
-            .setTitle(R.string.language)
-            .setSingleChoiceItems(names, checked) { d, which ->
-                d.dismiss()
-                val code = languages[which].first
-                // يعيد تشغيل الشاشات باللغة الجديدة ويحفظ الاختيار
-                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                    if (code.isEmpty()) androidx.core.os.LocaleListCompat.getEmptyLocaleList()
-                    else androidx.core.os.LocaleListCompat.forLanguageTags(code))
-            }
-            .show()
-    }
-
-    // ---------------- الإخفاء ----------------
-
-    private fun chooseHiddenSection() {
-        val types = arrayOf(ContentType.LIVE, ContentType.MOVIE, ContentType.SERIES)
-        val names = arrayOf(getString(R.string.live), getString(R.string.movies), getString(R.string.series))
-        AlertDialog.Builder(this)
-            .setTitle(R.string.hidden_setting)
-            .setItems(names) { _, which -> manageHidden(types[which], names[which]) }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    /** قائمة بكل الباقات + العناصر المخفية: المؤشَّر = مخفي */
-    private fun manageHidden(type: ContentType, title: String) {
-        if (app.prefs.profile == null) {
-            android.widget.Toast.makeText(this, R.string.no_playlist, android.widget.Toast.LENGTH_LONG).show()
-            return
-        }
-        val wait = android.widget.Toast.makeText(this, R.string.refreshing, android.widget.Toast.LENGTH_SHORT)
-        wait.show()
-        lifecycleScope.launch {
-            val content = runCatching { app.repo.load(type, false) }.getOrNull()
-            wait.cancel()
-            val g = app.groups
-            val hc = g.hiddenCategories(type)
-            val hi = g.hiddenItems(type)
-            // الباقات من السيرفر + أي باقة مخفية لم تعد موجودة + العناصر المخفية
-            data class Entry(val isCat: Boolean, val id: String, val name: String)
-            val entries = ArrayList<Entry>()
-            content?.categories?.forEach { entries += Entry(true, it.id, it.name) }
-            hc.forEach { (id, n) -> if (entries.none { it.isCat && it.id == id }) entries += Entry(true, id, n) }
-            hi.forEach { (k, n) -> entries += Entry(false, k, n) }
-            if (entries.isEmpty()) {
-                android.widget.Toast.makeText(this@HomeActivity, R.string.empty_list, android.widget.Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val labels = entries.map { (if (it.isCat) "📁  " else "▸  ") + it.name }.toTypedArray()
-            val checked = BooleanArray(entries.size) { i ->
-                val e = entries[i]; if (e.isCat) e.id in hc else e.id in hi
-            }
-            AlertDialog.Builder(this@HomeActivity)
-                .setTitle(getString(R.string.hide_title, title))
-                .setMultiChoiceItems(labels, checked) { _, i, on -> checked[i] = on }
-                .setPositiveButton(R.string.save) { _, _ ->
-                    entries.forEachIndexed { i, e ->
-                        if (e.isCat) g.setCategoryHidden(type, e.id, e.name, checked[i])
-                        else g.setItemHidden(type, e.id, e.name, checked[i])
-                    }
-                    android.widget.Toast.makeText(this@HomeActivity, R.string.saved, android.widget.Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        }
     }
 }

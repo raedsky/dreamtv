@@ -122,7 +122,7 @@ class CategoryAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false))
+        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false).also { ThemeUi.apply(it) })
 
     override fun onBindViewHolder(h: VH, position: Int) {
         val r = rows[position]
@@ -177,6 +177,7 @@ class ItemAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val layout = if (type == ContentType.LIVE) R.layout.item_channel else R.layout.item_poster
         val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        ThemeUi.apply(v)
         if (type != ContentType.LIVE) {
             // تكبير البوستر المحدد مثل IBO
             v.setOnFocusChangeListener { view, has ->
@@ -232,7 +233,7 @@ class EpisodeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_episode, parent, false))
+        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_episode, parent, false).also { ThemeUi.apply(it) })
 
     override fun onBindViewHolder(h: VH, position: Int) {
         val e = episodes[position]

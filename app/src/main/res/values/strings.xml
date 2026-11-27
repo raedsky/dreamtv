@@ -130,4 +130,19 @@
     <string name="language">Language</string>
     <string name="language_setting">Language: %1$s</string>
     <string name="language_system">Device language</string>
+    <string name="change_playlist">Change playlist</string>
+    <string name="theme">Theme</string>
+    <string name="hide_live">Hide live categories</string>
+    <string name="hide_movies">Hide movie categories</string>
+    <string name="hide_series">Hide series categories</string>
+    <string name="clear_live_history">Clear channel history</string>
+    <string name="clear_movies_history">Clear movie history</string>
+    <string name="clear_series_history">Clear series history</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="sort_live">Sort live channels</string>
+    <string name="live_format_title">Live stream format</string>
+    <string name="players">Players</string>
+    <string name="sd_only_title">SD quality only</string>
+    <string name="update_now">Update now</string>
+    <string name="mac_address">MAC address: %1$s</string>
 </resources>

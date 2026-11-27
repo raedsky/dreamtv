@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@drawable/bg_ibo">
+    android:tag="bg">
 
     <ImageView
         android:id="@+id/ivBackdrop"
@@ -31,7 +31,7 @@
             <ImageView
                 android:id="@+id/ivPoster"
                 android:layout_width="230dp" android:layout_height="345dp"
-                android:background="@drawable/bg_panel"
+                android:tag="panel"
                 android:scaleType="centerCrop" />
 
             <LinearLayout
@@ -93,7 +93,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="320dp" android:layout_height="5dp"
                     android:layout_marginBottom="12dp"
-                    android:max="100" android:progressTint="@color/accent"
+                    android:max="100" android:tag="progress"
                     android:visibility="gone" />
 
                 <LinearLayout

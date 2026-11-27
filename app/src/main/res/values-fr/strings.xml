@@ -127,4 +127,19 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="language">Langue</string>
     <string name="language_setting">Langue : %1$s</string>
     <string name="language_system">Langue de l\'appareil</string>
+    <string name="change_playlist">Changer de playlist</string>
+    <string name="theme">Thème</string>
+    <string name="hide_live">Masquer les catégories TV</string>
+    <string name="hide_movies">Masquer les catégories de films</string>
+    <string name="hide_series">Masquer les catégories de séries</string>
+    <string name="clear_live_history">Effacer l\'historique des chaînes</string>
+    <string name="clear_movies_history">Effacer l\'historique des films</string>
+    <string name="clear_series_history">Effacer l\'historique des séries</string>
+    <string name="history_cleared">Historique effacé</string>
+    <string name="sort_live">Trier les chaînes</string>
+    <string name="live_format_title">Format du direct</string>
+    <string name="players">Lecteurs</string>
+    <string name="sd_only_title">Qualité SD uniquement</string>
+    <string name="update_now">Mettre à jour</string>
+    <string name="mac_address">Adresse MAC : %1$s</string>
 </resources>

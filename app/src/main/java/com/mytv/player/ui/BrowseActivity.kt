@@ -106,6 +106,9 @@ class BrowseActivity : AppCompatActivity() {
                 ContentType.SERIES -> R.string.series
             }
         )
+        ThemeUi.apply(findViewById(android.R.id.content))
+        findViewById<android.widget.ImageView>(R.id.ivSection).imageTintList =
+            android.content.res.ColorStateList.valueOf(com.mytv.player.data.Themes.current.accent)
         findViewById<android.widget.ImageView>(R.id.ivSection).setImageResource(
             when (type) {
                 ContentType.LIVE -> R.drawable.ic_live
@@ -594,13 +597,18 @@ class BrowseActivity : AppCompatActivity() {
                 val row = LinearLayout(this@BrowseActivity).apply {
                     orientation = LinearLayout.VERTICAL
                     setPadding(pad, pad, pad, pad)
-                    if (isNow) setBackgroundResource(R.drawable.bg_epg_now)
+                    if (isNow) background = android.graphics.drawable.GradientDrawable().apply {
+                        cornerRadius = 8 * resources.displayMetrics.density
+                        setColor(0x26FFFFFF)
+                        setStroke((resources.displayMetrics.density).toInt().coerceAtLeast(1), com.mytv.player.data.Themes.current.accent)
+                    }
                 }
                 row.addView(TextView(this@BrowseActivity).apply {
                     text = tf.format(java.util.Date(e.start * 1000)) + " - " + tf.format(java.util.Date(e.end * 1000)) +
                         if (isNow) "   •  " + getString(R.string.now_playing) else ""
                     setTextColor(androidx.core.content.ContextCompat.getColor(context,
-                        if (isNow) R.color.accent else R.color.text_secondary))
+                        R.color.text_secondary))
+                    if (isNow) setTextColor(com.mytv.player.data.Themes.current.accent)
                     textSize = 12f
                 })
                 row.addView(TextView(this@BrowseActivity).apply {
@@ -616,7 +624,7 @@ class BrowseActivity : AppCompatActivity() {
                         max = 100
                         progress = (((now - e.start) * 100) / (e.end - e.start).coerceAtLeast(1)).toInt()
                         progressTintList = android.content.res.ColorStateList.valueOf(
-                            androidx.core.content.ContextCompat.getColor(context, R.color.accent))
+                            com.mytv.player.data.Themes.current.accent)
                     }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, pad / 2).apply { topMargin = pad / 2 })
                     if (!e.desc.isNullOrBlank()) row.addView(TextView(this@BrowseActivity).apply {
                         text = e.desc

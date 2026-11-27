@@ -48,6 +48,7 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".ui.SeriesDetailActivity" android:screenOrientation="sensorLandscape" />
         <activity android:name=".ui.MovieDetailActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.SettingsActivity" android:screenOrientation="sensorLandscape" />
         <activity android:name=".ui.ActivationActivity" />
         <activity
             android:name=".ui.PlayerActivity"

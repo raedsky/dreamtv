@@ -127,4 +127,19 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="language">Dil</string>
     <string name="language_setting">Dil: %1$s</string>
     <string name="language_system">Cihaz dili</string>
+    <string name="change_playlist">Listeyi değiştir</string>
+    <string name="theme">Tema</string>
+    <string name="hide_live">Canlı kategorileri gizle</string>
+    <string name="hide_movies">Film kategorilerini gizle</string>
+    <string name="hide_series">Dizi kategorilerini gizle</string>
+    <string name="clear_live_history">Kanal geçmişini temizle</string>
+    <string name="clear_movies_history">Film geçmişini temizle</string>
+    <string name="clear_series_history">Dizi geçmişini temizle</string>
+    <string name="history_cleared">Geçmiş temizlendi</string>
+    <string name="sort_live">Canlı kanalları sırala</string>
+    <string name="live_format_title">Canlı yayın biçimi</string>
+    <string name="players">Oynatıcılar</string>
+    <string name="sd_only_title">Yalnızca SD kalite</string>
+    <string name="update_now">Şimdi güncelle</string>
+    <string name="mac_address">MAC adresi: %1$s</string>
 </resources>

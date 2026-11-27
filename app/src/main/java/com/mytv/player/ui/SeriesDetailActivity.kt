@@ -43,6 +43,7 @@ class SeriesDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         item = pending ?: run { finish(); return }
         setContentView(R.layout.activity_series_detail)
+        ThemeUi.apply(findViewById(android.R.id.content))
 
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<TextView>(R.id.tvTitle).text = item.name
@@ -178,7 +179,7 @@ class SeriesDetailActivity : AppCompatActivity() {
                 tag = s
                 textSize = 16f
                 setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                setBackgroundResource(R.drawable.bg_tab)
+                background = ThemeUi.tab(context)
                 setPadding(pad * 2, pad * 2 / 3, pad * 2, pad * 2 / 3)
                 isFocusable = true
                 isClickable = true

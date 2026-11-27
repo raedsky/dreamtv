@@ -18,31 +18,37 @@ class StreaksView @JvmOverloads constructor(
     // x (نسبة من العرض), العرض بالـ dp, اللون, بداية ونهاية الخط (نسبة من الارتفاع)
     private class Streak(val x: Float, val w: Float, val color: Int, val top: Float, val bottom: Float)
 
-    private val streaks = listOf(
-        Streak(0.08f, 10f, 0x997B2FF7.toInt(), 0.45f, 1.0f),
-        Streak(0.14f, 26f, 0xAAC026D3.toInt(), 0.35f, 1.0f),
-        Streak(0.19f, 8f, 0x883B5BFF.toInt(), 0.50f, 0.95f),
-        Streak(0.26f, 18f, 0x777B2FF7.toInt(), 0.20f, 0.85f),
-        Streak(0.33f, 12f, 0x66C026D3.toInt(), 0.40f, 1.0f),
-        Streak(0.41f, 6f, 0x553B5BFF.toInt(), 0.10f, 0.70f),
-        Streak(0.48f, 22f, 0x557B2FF7.toInt(), 0.30f, 0.90f),
-        Streak(0.56f, 10f, 0x66C026D3.toInt(), 0.15f, 0.80f),
-        Streak(0.63f, 16f, 0x663B5BFF.toInt(), 0.25f, 1.0f),
-        Streak(0.71f, 8f, 0x777B2FF7.toInt(), 0.05f, 0.75f),
-        Streak(0.78f, 24f, 0x88C026D3.toInt(), 0.20f, 0.95f),
-        Streak(0.85f, 12f, 0x883B5BFF.toInt(), 0.40f, 1.0f),
-        Streak(0.92f, 18f, 0x997B2FF7.toInt(), 0.10f, 0.90f)
+    private fun col(i: Int) = com.mytv.player.data.Themes.current.streaks[i % 3]
+
+    private val streaks get() = listOf(
+        Streak(0.08f, 10f, col(0), 0.45f, 1.0f),
+        Streak(0.14f, 26f, col(1), 0.35f, 1.0f),
+        Streak(0.19f, 8f, col(2), 0.50f, 0.95f),
+        Streak(0.26f, 18f, col(0), 0.20f, 0.85f),
+        Streak(0.33f, 12f, col(1), 0.40f, 1.0f),
+        Streak(0.41f, 6f, col(2), 0.10f, 0.70f),
+        Streak(0.48f, 22f, col(0), 0.30f, 0.90f),
+        Streak(0.56f, 10f, col(1), 0.15f, 0.80f),
+        Streak(0.63f, 16f, col(2), 0.25f, 1.0f),
+        Streak(0.71f, 8f, col(0), 0.05f, 0.75f),
+        Streak(0.78f, 24f, col(1), 0.20f, 0.95f),
+        Streak(0.85f, 12f, col(2), 0.40f, 1.0f),
+        Streak(0.92f, 18f, col(0), 0.10f, 0.90f)
     )
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)   // مطلوب لتأثير التوهج (Blur)
-        setBackgroundColor(Color.BLACK)
+        setBackgroundColor(com.mytv.player.data.Themes.current.bg)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        val t = com.mytv.player.data.Themes.current
+        canvas.drawPaint(Paint().apply {
+            shader = LinearGradient(0f, 0f, 0f, height.toFloat(), t.bg, t.bgEnd, Shader.TileMode.CLAMP)
+        })
         val d = resources.displayMetrics.density
         paint.maskFilter = BlurMaskFilter(14f * d, BlurMaskFilter.Blur.NORMAL)
         for (s in streaks) {

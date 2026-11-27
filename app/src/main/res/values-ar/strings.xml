@@ -130,4 +130,19 @@
     <string name="language">اللغة</string>
     <string name="language_setting">اللغة: %1$s</string>
     <string name="language_system">لغة الجهاز</string>
+    <string name="change_playlist">تغيير قائمة التشغيل</string>
+    <string name="theme">الثيم</string>
+    <string name="hide_live">إخفاء الفئات المباشرة</string>
+    <string name="hide_movies">إخفاء فئات الأفلام</string>
+    <string name="hide_series">إخفاء فئات المسلسلات</string>
+    <string name="clear_live_history">مسح سجل القنوات</string>
+    <string name="clear_movies_history">مسح سجل الأفلام</string>
+    <string name="clear_series_history">مسح سجل المسلسلات</string>
+    <string name="history_cleared">تم مسح السجل</string>
+    <string name="sort_live">فرز القنوات المباشرة</string>
+    <string name="live_format_title">تنسيق البث المباشر</string>
+    <string name="players">المشغلات</string>
+    <string name="sd_only_title">جودة SD فقط</string>
+    <string name="update_now">تحديث الآن</string>
+    <string name="mac_address">عنوان ماك: %1$s</string>
 </resources>

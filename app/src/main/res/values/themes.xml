@@ -230,7 +230,7 @@
         <item name="android:layout_width">44dp</item>
         <item name="android:layout_height">44dp</item>
         <item name="android:layout_marginStart">8dp</item>
-        <item name="android:background">@drawable/bg_circle_btn</item>
+        <item name="android:tag">circle</item>
         <item name="android:padding">11dp</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:tint">#FFFFFFFF</item>
@@ -241,7 +241,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">52dp</item>
         <item name="android:layout_marginEnd">12dp</item>
-        <item name="android:background">@drawable/bg_btn</item>
+        <item name="android:tag">btn</item>
         <item name="android:gravity">center</item>
         <item name="android:paddingStart">28dp</item>
         <item name="android:paddingEnd">28dp</item>
@@ -250,5 +250,38 @@
         <item name="android:textStyle">bold</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
+    </style>
+
+    <!-- أزرار الشاشة الرئيسية الصغيرة -->
+    <style name="HomeSmall">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginEnd">14dp</item>
+        <item name="android:tag">card_small</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">8dp</item>
+    </style>
+    <style name="HomeSmallIcon">
+        <item name="android:layout_width">46dp</item>
+        <item name="android:layout_height">46dp</item>
+    </style>
+    <style name="HomeSmallText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <!-- عنصر في شبكة الإعدادات -->
+    <style name="SettingTile">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">64dp</item>
     </style>
 </resources>

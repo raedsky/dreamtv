@@ -25,6 +25,7 @@ class App : Application() {
         groups = GroupStore(this)
         repo = Repository(prefs)
         watch = com.mytv.player.data.WatchStore(this)
+        com.mytv.player.data.Themes.load(this)
     }
 
     companion object {

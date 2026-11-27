@@ -37,6 +37,7 @@ class MovieDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         item = pending ?: run { finish(); return }
         setContentView(R.layout.activity_movie_detail)
+        ThemeUi.apply(findViewById(android.R.id.content))
 
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<TextView>(R.id.tvTitle).text = item.name

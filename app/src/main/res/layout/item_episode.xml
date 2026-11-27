@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:layout_marginVertical="3dp"
-    android:background="@drawable/bg_row" android:clickable="true" android:focusable="true"
+    android:tag="row" android:clickable="true" android:focusable="true"
     android:gravity="center_vertical" android:orientation="horizontal" android:padding="8dp">
     <FrameLayout
         android:layout_width="128dp" android:layout_height="72dp">
@@ -29,7 +29,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent" android:layout_height="4dp"
             android:layout_gravity="bottom"
-            android:max="100" android:progressTint="@color/accent"
+            android:max="100" android:tag="progress"
             android:visibility="gone" />
     </FrameLayout>
     <LinearLayout

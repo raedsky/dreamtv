@@ -24,7 +24,8 @@ data class PanelState(
     val device: PanelDevice?,
     val dns: List<PanelDns>?,
     val playlists: List<PanelPlaylist>?,
-    val message: PanelMessage?
+    val message: PanelMessage?,
+    val theme: String? = null
 )
 
 /** الاتصال بلوحة التحكم (api.php). */

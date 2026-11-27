@@ -127,4 +127,19 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="language">Idioma</string>
     <string name="language_setting">Idioma: %1$s</string>
     <string name="language_system">Idioma del dispositivo</string>
+    <string name="change_playlist">Cambiar lista</string>
+    <string name="theme">Tema</string>
+    <string name="hide_live">Ocultar categorías en directo</string>
+    <string name="hide_movies">Ocultar categorías de películas</string>
+    <string name="hide_series">Ocultar categorías de series</string>
+    <string name="clear_live_history">Borrar historial de canales</string>
+    <string name="clear_movies_history">Borrar historial de películas</string>
+    <string name="clear_series_history">Borrar historial de series</string>
+    <string name="history_cleared">Historial borrado</string>
+    <string name="sort_live">Ordenar canales en directo</string>
+    <string name="live_format_title">Formato en directo</string>
+    <string name="players">Reproductores</string>
+    <string name="sd_only_title">Solo calidad SD</string>
+    <string name="update_now">Actualizar ahora</string>
+    <string name="mac_address">Dirección MAC: %1$s</string>
 </resources>
