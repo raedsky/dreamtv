@@ -122,7 +122,8 @@ class LoginActivity : AppCompatActivity() {
         findViewById<View>(R.id.rgType).isVisible = false
         rbXtream.isChecked = true
         etServer.isVisible = false
-        dnsList = com.mytv.player.data.Panel.cached()?.dns.orEmpty().filter { !it.url.isNullOrBlank() }
+        dnsList = com.mytv.player.data.Panel.cached()?.dns.orEmpty()
+            .filter { !it.url.isNullOrBlank() && (it.type.isNullOrBlank() || it.type == "xtream") }
             .ifEmpty {
                 listOf(com.mytv.player.data.PanelDns(0, com.mytv.player.PanelConfig.DEFAULT_SERVER_NAME,
                     com.mytv.player.PanelConfig.DEFAULT_SERVER))

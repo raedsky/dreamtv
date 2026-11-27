@@ -14,7 +14,7 @@ import java.net.URLEncoder
 import java.security.MessageDigest
 
 data class PanelDevice(val mac: String?, val status: String?, val allowed: Boolean, val expires_at: Long?)
-data class PanelDns(val id: Long, val name: String?, val url: String?)
+data class PanelDns(val id: Long, val name: String?, val url: String?, val type: String? = null)
 data class PanelPlaylist(
     val id: Long, val name: String?, val kind: String?, val url: String?,
     val server: String?, val username: String?, val password: String?
