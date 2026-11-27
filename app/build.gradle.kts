@@ -15,10 +15,24 @@ android {
         versionName = "1.1"
     }
 
+    // توقيع ثابت اختياري: يُفعّل فقط إذا وُجدت أسرار KEYSTORE_* في GitHub
+    val ksFile = System.getenv("KEYSTORE_FILE")
+    val hasKs = !ksFile.isNullOrBlank() && file(ksFile).exists()
+    signingConfigs {
+        create("rel") {
+            if (hasKs) {
+                storeFile = file(ksFile!!)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (hasKs) "rel" else "debug")
         }
     }
 
