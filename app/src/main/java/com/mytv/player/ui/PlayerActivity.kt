@@ -86,7 +86,8 @@ object Playback {
 
 /** قائمة التشغيل الحالية (تُستخدم لتقليب القنوات بالأسهم في المباشر). */
 object PlayQueue {
-    data class Entry(val title: String, val url: String)
+    /** [key] لحفظ مكان المشاهدة (أفلام/حلقات)، [seriesKey] لتذكّر آخر حلقة في المسلسل */
+    data class Entry(val title: String, val url: String, val key: String? = null, val seriesKey: String? = null)
 
     var entries: List<Entry> = emptyList()
         private set
@@ -179,13 +180,63 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        saveProgress()
+        if (::tvTitle.isInitialized) tvTitle.removeCallbacks(saveTick)
         player?.release()
         player = null
+    }
+
+    // ---------------- حفظ مكان المشاهدة ----------------
+
+    private val saveTick = object : Runnable {
+        override fun run() {
+            saveProgress()
+            tvTitle.postDelayed(this, 10_000)
+        }
+    }
+
+    private fun saveProgress() {
+        val e = PlayQueue.current ?: return
+        val key = e.key ?: return
+        if (PlayQueue.live) return
+        val p = player ?: return
+        val dur = p.duration.takeIf { it > 0 } ?: 0L
+        App.instance.watch.save(key, p.currentPosition, dur, e.seriesKey)
+    }
+
+    private var resumeDialog: androidx.appcompat.app.AlertDialog? = null
+
+    /** إذا فيه مكان محفوظ: نسأل "متابعة أو من البداية" */
+    private fun askResume(e: PlayQueue.Entry, p: ExoPlayer) {
+        val key = e.key ?: return
+        if (PlayQueue.live) return
+        val pos = App.instance.watch.resumePosition(key) ?: return
+        p.playWhenReady = false
+        resumeDialog?.dismiss()
+        resumeDialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(e.title)
+            .setItems(arrayOf(
+                getString(R.string.resume_from, com.mytv.player.data.WatchStore.format(pos)),
+                getString(R.string.start_over)
+            )) { _, which ->
+                if (which == 0) p.seekTo(pos)
+                p.playWhenReady = true
+            }
+            .setOnCancelListener { p.seekTo(pos); p.playWhenReady = true }
+            .show()
     }
 
     private fun initPlayer() {
         val p = Players.create(this)
         p.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                // نهاية الحلقة: نحفظها كمشاهدة وننتقل للحلقة التالية تلقائياً
+                if (state == Player.STATE_ENDED && !PlayQueue.live) {
+                    saveProgress()
+                    if (PlayQueue.index < PlayQueue.entries.size - 1) zap(1)
+                }
+            }
+
             override fun onPlayerError(error: PlaybackException) {
                 Toast.makeText(
                     this@PlayerActivity,
@@ -246,6 +297,9 @@ class PlayerActivity : AppCompatActivity() {
         p.prepare()
         p.playWhenReady = true
         showTitle(e.title)
+        askResume(e, p)
+        tvTitle.removeCallbacks(saveTick)
+        if (!PlayQueue.live && e.key != null) tvTitle.postDelayed(saveTick, 10_000)
     }
 
     private fun showTitle(title: String) {
@@ -259,6 +313,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun zap(delta: Int) {
         val size = PlayQueue.entries.size
         if (size <= 1) return
+        saveProgress()
         if (PlayQueue.live) {
             PlayQueue.index = (PlayQueue.index + delta + size) % size   // القنوات تدور
         } else {

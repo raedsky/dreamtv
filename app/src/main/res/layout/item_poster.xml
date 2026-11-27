@@ -26,6 +26,13 @@
             android:text="♥" android:textColor="#FFFF4D6D" android:textSize="20sp"
             android:shadowColor="#000000" android:shadowRadius="4"
             android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/pbWatch"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:layout_gravity="bottom"
+            android:max="100" android:progressTint="@color/accent"
+            android:visibility="gone" />
     </FrameLayout>
     <TextView
         android:id="@+id/tvName"

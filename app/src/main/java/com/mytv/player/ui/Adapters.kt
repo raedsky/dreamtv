@@ -76,7 +76,7 @@ object Images {
 
 /** صف في قائمة التصنيفات الجانبية. */
 data class CategoryRow(val kind: Kind, val id: String, val name: String, val count: Int) {
-    enum class Kind { RECENT, ALL, FAVORITES, GROUP, ADD_GROUP, SERVER }
+    enum class Kind { RECENT, LATEST, ALL, FAVORITES, GROUP, ADD_GROUP, SERVER }
     val key: String get() = "${kind.name}:$id"
 }
 
@@ -129,6 +129,7 @@ class CategoryAdapter(
         val ctx = h.itemView.context
         h.name.text = when (r.kind) {
             CategoryRow.Kind.RECENT -> "↺  ${r.name}"
+            CategoryRow.Kind.LATEST -> "✦  ${r.name}"
             CategoryRow.Kind.FAVORITES -> "♥  ${r.name}"
             CategoryRow.Kind.GROUP -> "▣  ${r.name}"
             CategoryRow.Kind.ADD_GROUP -> "＋  ${r.name}"
@@ -170,6 +171,7 @@ class ItemAdapter(
         val fav: TextView = v.findViewById(R.id.tvFav)
         val num: TextView? = v.findViewById(R.id.tvNum)
         val rating: TextView? = v.findViewById(R.id.tvRating)
+        val watch: android.widget.ProgressBar? = v.findViewById(R.id.pbWatch)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -195,6 +197,12 @@ class ItemAdapter(
             r.isVisible = !item.rating.isNullOrBlank()
             r.text = "★ ${item.rating}"
         }
+        h.watch?.let { pb ->
+            val w = com.mytv.player.App.instance.watch
+            val prog = if (w.resumePosition(item.key) != null) w.get(item.key) else null
+            pb.isVisible = prog != null && prog.duration > 0
+            if (prog != null) pb.progress = prog.percent
+        }
         Images.load(h.image, item.icon)
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
@@ -219,6 +227,8 @@ class EpisodeAdapter(
         val title: TextView = v.findViewById(R.id.tvTitle)
         val sub: TextView = v.findViewById(R.id.tvSub)
         val thumb: ImageView = v.findViewById(R.id.ivThumb)
+        val watch: android.widget.ProgressBar = v.findViewById(R.id.pbWatch)
+        val done: TextView = v.findViewById(R.id.tvWatched)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -231,6 +241,12 @@ class EpisodeAdapter(
         h.sub.text = sub
         h.sub.isVisible = sub.isNotEmpty()
         Images.load(h.thumb, e.icon ?: fallbackImage())
+        val w = com.mytv.player.App.instance.watch
+        val key = com.mytv.player.data.WatchStore.episodeKey(e)
+        val prog = if (w.resumePosition(key) != null) w.get(key) else null
+        h.watch.isVisible = prog != null && prog.duration > 0
+        if (prog != null) h.watch.progress = prog.percent
+        h.done.isVisible = prog == null && w.isWatched(key)
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) onClick(pos)

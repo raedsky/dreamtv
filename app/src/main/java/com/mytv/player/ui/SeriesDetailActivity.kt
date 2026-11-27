@@ -49,6 +49,7 @@ class SeriesDetailActivity : AppCompatActivity() {
         Images.load(findViewById<ImageView>(R.id.ivCover), item.icon)
         Images.load(findViewById<ImageView>(R.id.ivBackdrop), item.icon)
         showRating(item.rating)
+        findViewById<TextView>(R.id.tvMeta).text = updatedLine().orEmpty()
         btnFav = findViewById(R.id.btnFav)
         btnFav.setOnClickListener {
             App.instance.groups.toggleFavorite(com.mytv.player.data.ContentType.SERIES, item.key)
@@ -62,11 +63,7 @@ class SeriesDetailActivity : AppCompatActivity() {
         rv = findViewById(R.id.rvEpisodes)
         adapter = EpisodeAdapter({ item.icon }) { index ->
             // نشغّل ضمن حلقات الموسم الحالي (⏮ ⏭ تنقل بين الحلقات)
-            Playback.play(
-                this,
-                adapter.episodes.map { PlayQueue.Entry("${item.name} - ${EpisodeAdapter.episodeLabel(it)}", it.url) },
-                index, live = false
-            )
+            playEpisodes(adapter.episodes, index)
         }
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
@@ -92,9 +89,61 @@ class SeriesDetailActivity : AppCompatActivity() {
 
     private lateinit var btnFav: TextView
 
+    private fun playEpisodes(list: List<Episode>, index: Int) {
+        App.instance.groups.addRecent(com.mytv.player.data.ContentType.SERIES, item.key)
+        Playback.play(
+            this,
+            list.map {
+                PlayQueue.Entry("${item.name} - ${EpisodeAdapter.episodeLabel(it)}", it.url,
+                    key = com.mytv.player.data.WatchStore.episodeKey(it), seriesKey = item.key)
+            },
+            index, live = false
+        )
+    }
+
+    /** آخر حلقة شاهدتها في هذا المسلسل */
+    private fun lastEpisode(): Episode? {
+        val k = App.instance.watch.lastEpisode(item.key) ?: return null
+        return allEpisodes.firstOrNull { com.mytv.player.data.WatchStore.episodeKey(it) == k }
+    }
+
+    /** زر "متابعة S01 E03" */
+    private fun updateResume() {
+        val btn = findViewById<TextView>(R.id.btnResume)
+        val last = lastEpisode()
+        if (last == null) { btn.isVisible = false; return }
+        val w = App.instance.watch
+        val key = com.mytv.player.data.WatchStore.episodeKey(last)
+        // الحلقة الأخيرة انتهت؟ نقترح التي بعدها
+        val target = if (w.resumePosition(key) == null && w.isWatched(key))
+            allEpisodes.getOrNull(allEpisodes.indexOf(last) + 1) ?: last else last
+        btn.isVisible = true
+        btn.text = "▶  " + getString(R.string.continue_ep,
+            String.format(java.util.Locale.US, "S%02d E%02d", target.season, target.number))
+        btn.setOnClickListener {
+            val seasonList = allEpisodes.filter { it.season == target.season }
+            playEpisodes(seasonList, seasonList.indexOf(target).coerceAtLeast(0))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (allEpisodes.isNotEmpty()) {
+            adapter.notifyDataSetChanged()
+            updateResume()
+        }
+    }
+
     private fun updateFav() {
         val fav = item.key in App.instance.groups.favorites(com.mytv.player.data.ContentType.SERIES)
         btnFav.text = (if (fav) "♥  " else "♡  ") + getString(if (fav) R.string.remove_favorite else R.string.add_favorite)
+    }
+
+    /** "آخر تحديث: ..." من تاريخ آخر تعديل في السيرفر */
+    private fun updatedLine(): String? {
+        if (item.added <= 0) return null
+        val d = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(item.added * 1000))
+        return getString(R.string.last_update, d)
     }
 
     private fun showRating(r: String?) {
@@ -109,7 +158,8 @@ class SeriesDetailActivity : AppCompatActivity() {
         showRating(info.rating ?: item.rating)
         val year = info.release?.take(4)?.takeIf { it.all(Char::isDigit) }
         findViewById<TextView>(R.id.tvMeta).text =
-            listOfNotNull(year, info.genre).filter { it.isNotBlank() }.joinToString("  •  ")
+            (listOfNotNull(year, info.genre).filter { it.isNotBlank() } + listOfNotNull(updatedLine()))
+                .joinToString("  •  ")
         findViewById<TextView>(R.id.tvPlot).text = info.plot.orEmpty()
         findViewById<TextView>(R.id.tvCast).apply {
             isVisible = !info.cast.isNullOrBlank()
@@ -139,9 +189,19 @@ class SeriesDetailActivity : AppCompatActivity() {
             ).apply { marginEnd = pad / 2 }
             seasonBar.addView(b, lp)
         }
-        seasons.firstOrNull()?.let { showSeason(it) }
-        (if (seasons.size > 1) seasonBar.getChildAt(0) else null)?.requestFocus()
-            ?: rv.post { rv.getChildAt(0)?.requestFocus() }
+        updateResume()
+        // نفتح على موسم آخر حلقة شاهدتها ونحدد الحلقة
+        val last = lastEpisode()
+        val startSeason = last?.season ?: seasons.firstOrNull()
+        startSeason?.let { showSeason(it) }
+        if (last != null) {
+            val pos = adapter.episodes.indexOf(last).coerceAtLeast(0)
+            rv.scrollToPosition(pos)
+            rv.post { (rv.findViewHolderForAdapterPosition(pos)?.itemView ?: rv.getChildAt(0))?.requestFocus() }
+        } else {
+            (if (seasons.size > 1) seasonBar.getChildAt(0) else null)?.requestFocus()
+                ?: rv.post { rv.getChildAt(0)?.requestFocus() }
+        }
     }
 
     private fun showSeason(season: Int) {

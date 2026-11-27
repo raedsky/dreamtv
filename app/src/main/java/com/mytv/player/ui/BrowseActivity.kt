@@ -40,6 +40,7 @@ class BrowseActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_TYPE = "type"
+        private const val LATEST_COUNT = 100
         fun start(ctx: Context, type: ContentType) =
             ctx.startActivity(Intent(ctx, BrowseActivity::class.java).putExtra(EXTRA_TYPE, type.name))
     }
@@ -162,6 +163,9 @@ class BrowseActivity : AppCompatActivity() {
         val rows = ArrayList<CategoryRow>()
         rows += CategoryRow(Kind.RECENT, "recent", getString(R.string.recent),
             app.groups.recents(type).count { it in index })
+        if (type != ContentType.LIVE && c.items.any { it.added > 0 }) {
+            rows += CategoryRow(Kind.LATEST, "latest", getString(R.string.recently_added), latest(c).size)
+        }
         rows += CategoryRow(Kind.ALL, "all", getString(R.string.all), c.items.size)
         rows += CategoryRow(Kind.FAVORITES, "fav", getString(R.string.favorites), favs.count { it in index })
         for (g in app.groups.groups(type)) {
@@ -187,9 +191,14 @@ class BrowseActivity : AppCompatActivity() {
         }
     }
 
+    /** آخر ما أضيف للسيرفر (أحدث 100) */
+    private fun latest(c: Repository.Content): List<StreamItem> =
+        c.items.filter { it.added > 0 }.sortedByDescending { it.added }.take(LATEST_COUNT)
+
     private fun itemsFor(row: CategoryRow): List<StreamItem> {
         val c = content ?: return emptyList()
         return when (row.kind) {
+            Kind.LATEST -> latest(c)
             Kind.RECENT -> app.groups.recents(type).mapNotNull { index[it] }
             Kind.ALL -> c.items
             Kind.FAVORITES -> app.groups.favorites(type).mapNotNull { index[it] }
@@ -205,7 +214,7 @@ class BrowseActivity : AppCompatActivity() {
         var list = if (q.isEmpty()) currentItems
                    else currentItems.filter { it.name.contains(q, ignoreCase = true) }
         // القروبات والمفضلة تبقى بترتيب المستخدم
-        if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES && current?.kind != Kind.RECENT) {
+        if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES && current?.kind != Kind.RECENT && current?.kind != Kind.LATEST) {
             list = when (app.prefs.sortMode) {
                 "added" -> list.sortedByDescending { it.added }
                 "name" -> list.sortedBy { it.name.lowercase() }

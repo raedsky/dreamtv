@@ -116,4 +116,10 @@
     <string name="trailer">الإعلان</string>
     <string name="director">المخرج: %1$s</string>
     <string name="cast">الممثلون: %1$s</string>
+    <string name="recently_added">أضيف حديثاً</string>
+    <string name="resume_from">متابعة من %1$s</string>
+    <string name="start_over">من البداية</string>
+    <string name="continue_ep">متابعة %1$s</string>
+    <string name="last_update">آخر تحديث: %1$s</string>
+    <string name="added_on">أضيف: %1$s</string>
 </resources>

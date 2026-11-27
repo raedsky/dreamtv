@@ -43,13 +43,13 @@ class MovieDetailActivity : AppCompatActivity() {
         Images.load(findViewById(R.id.ivPoster), item.icon)
         Images.load(findViewById(R.id.ivBackdrop), item.icon)
         showRating(item.rating)
+        findViewById<TextView>(R.id.tvMeta).text = addedLine().orEmpty()
 
         val btnPlay = findViewById<TextView>(R.id.btnPlay)
-        btnPlay.text = "▶  " + getString(R.string.play)
         btnPlay.setOnClickListener {
             val url = item.url ?: return@setOnClickListener
             app.groups.addRecent(ContentType.MOVIE, item.key)
-            Playback.play(this, listOf(PlayQueue.Entry(item.name, url)), 0, live = false)
+            Playback.play(this, listOf(PlayQueue.Entry(item.name, url, key = item.key)), 0, live = false)
         }
         btnFav = findViewById(R.id.btnFav)
         btnFav.setOnClickListener {
@@ -79,7 +79,8 @@ class MovieDetailActivity : AppCompatActivity() {
         showRating(info.rating ?: item.rating)
         val year = info.release?.take(4)?.takeIf { it.all(Char::isDigit) }
         findViewById<TextView>(R.id.tvMeta).text =
-            listOfNotNull(year, info.duration, info.genre).filter { it.isNotBlank() }.joinToString("   •   ")
+            (listOfNotNull(year, info.duration, info.genre).filter { it.isNotBlank() } + listOfNotNull(addedLine()))
+                .joinToString("   •   ")
         findViewById<TextView>(R.id.tvPlot).text = info.plot.orEmpty()
         findViewById<TextView>(R.id.tvDirector).apply {
             isVisible = !info.director.isNullOrBlank()
@@ -98,6 +99,24 @@ class MovieDetailActivity : AppCompatActivity() {
                 runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // زر التشغيل يبين "متابعة من 00:45:10" إذا شاهدت جزءاً من الفيلم
+        val pos = app.watch.resumePosition(item.key)
+        findViewById<TextView>(R.id.btnPlay).text = "▶  " + if (pos != null)
+            getString(R.string.resume_from, com.mytv.player.data.WatchStore.format(pos)) else getString(R.string.play)
+        val pb = findViewById<ProgressBar>(R.id.watchProgress)
+        val prog = app.watch.get(item.key)
+        pb.isVisible = pos != null && prog != null && prog.duration > 0
+        if (prog != null) pb.progress = prog.percent
+    }
+
+    private fun addedLine(): String? {
+        if (item.added <= 0) return null
+        val d = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(item.added * 1000))
+        return getString(R.string.added_on, d)
     }
 
     private fun showRating(r: String?) {

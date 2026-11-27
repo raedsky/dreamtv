@@ -15,6 +15,8 @@ class App : Application() {
         private set
     lateinit var repo: Repository
         private set
+    lateinit var watch: com.mytv.player.data.WatchStore
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -22,6 +24,7 @@ class App : Application() {
         prefs = Prefs(this)
         groups = GroupStore(this)
         repo = Repository(prefs)
+        watch = com.mytv.player.data.WatchStore(this)
     }
 
     companion object {
