@@ -148,4 +148,11 @@
     <string name="tab_home_full">Home</string>
     <string name="fullscreen">Full screen</string>
     <string name="search_btn">Search</string>
+    <string name="mac_label">MAC address</string>
+    <string name="server_port_label">URL + port</string>
+    <string name="playlist_title">Playlist</string>
+    <string name="welcome">Welcome</string>
+    <string name="enjoy_streaming">Enjoy your streaming!</string>
+    <string name="device_status">Active until</string>
+    <string name="active_now">Active</string>
 </resources>

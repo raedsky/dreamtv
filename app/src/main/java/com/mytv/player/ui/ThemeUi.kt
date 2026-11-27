@@ -112,6 +112,15 @@ object ThemeUi {
         intArrayOf(t.accent, 0xFFFFFFFF.toInt(), 0xFFFFFFFF.toInt())
     )
 
+    /** صندوق داكن بحد رفيع (شاشة إضافة القائمة) */
+    fun box(ctx: Context) = shape(ctx, 6f, 0xE60C0C10.toInt(), 0x4DFFFFFF, 1f)
+
+    /** خانة إدخال */
+    fun field(ctx: Context) = states(
+        shape(ctx, 6f, 0xFF15151A.toInt(), t.accent, 2f),
+        shape(ctx, 6f, 0xFF15151A.toInt(), 0x59FFFFFF, 1f)
+    )
+
     fun bg() = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(t.bg, t.bgEnd))
 
     /** يمر على كل الشاشة ويطبّق الثيم حسب android:tag */
@@ -131,6 +140,8 @@ object ThemeUi {
             "search" -> v.background = search(ctx)
             "accent" -> (v as? TextView)?.setTextColor(t.accent)
             "cell" -> v.background = cell(ctx)
+            "box" -> v.background = box(ctx)
+            "field" -> v.background = field(ctx)
             "cellbtn" -> v.background = cellBtn(ctx)
             "celltext" -> (v as? TextView)?.setTextColor(selectableText())
             "toptab" -> {

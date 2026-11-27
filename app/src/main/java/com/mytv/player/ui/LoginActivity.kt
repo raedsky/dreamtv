@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.RadioButton
@@ -46,13 +45,18 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var etUser: EditText
     private lateinit var etPass: EditText
     private lateinit var etM3u: EditText
-    private lateinit var btnConnect: Button
+    private lateinit var btnConnect: TextView
     private lateinit var progress: ProgressBar
     private lateinit var tvError: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        ThemeUi.apply(findViewById(android.R.id.content))
+        findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
+        if (com.mytv.player.PanelConfig.enabled) {
+            findViewById<TextView>(R.id.tvMac).text = com.mytv.player.data.Panel.deviceIds(this).first.lowercase()
+        }
 
         etName = findViewById(R.id.etName)
         rbXtream = findViewById(R.id.rbXtream)
@@ -73,6 +77,10 @@ class LoginActivity : AppCompatActivity() {
         rbM3u.setOnCheckedChangeListener { _, _ -> updateMode() }
 
         editingId = intent.getStringExtra(EXTRA_ID)
+        if (editingId != null) {
+            findViewById<TextView>(R.id.tvTitle).setText(R.string.edit)
+            btnConnect.setText(R.string.save)
+        }
         editingId?.let { id ->
             App.instance.prefs.profiles().firstOrNull { it.id == id }?.let { p ->
                 etName.setText(p.name)
@@ -99,6 +107,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         btnConnect.setOnClickListener { connect() }
+        etUser.requestFocus()
     }
 
     private fun showKeyboard(et: EditText) {
@@ -129,8 +138,11 @@ class LoginActivity : AppCompatActivity() {
                     com.mytv.player.PanelConfig.DEFAULT_SERVER))
             }
         val names = dnsList.map { it.name?.takeIf { n -> n.isNotBlank() } ?: it.url.orEmpty() }
-        spDns.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, names)
-        spDns.isVisible = dnsList.size > 1
+        spDns.adapter = android.widget.ArrayAdapter(this, R.layout.item_spinner, names).apply {
+            setDropDownViewResource(R.layout.item_spinner)
+        }
+        spDns.setPopupBackgroundDrawable(android.graphics.drawable.ColorDrawable(0xFF15151A.toInt()))
+        spDns.isVisible = true
     }
 
     private fun selectedServer(): String {

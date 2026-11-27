@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="128dp"
+    android:layout_margin="8dp"
+    android:tag="card_small"
+    android:clickable="true" android:focusable="true"
+    android:gravity="center" android:orientation="vertical" android:padding="12dp">
+    <TextView
+        android:id="@+id/tvIcon"
+        android:layout_width="46dp" android:layout_height="46dp"
+        android:background="@drawable/bg_icon_circle"
+        android:gravity="center"
+        android:textColor="#FFFFFFFF" android:textSize="26sp" />
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center" android:maxLines="1" android:ellipsize="end"
+        android:textColor="@color/text_primary" android:textSize="15sp" />
+    <TextView
+        android:id="@+id/tvSub"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center" android:maxLines="1" android:ellipsize="end"
+        android:tag="accent"
+        android:textSize="12sp" android:visibility="gone" />
+</LinearLayout>

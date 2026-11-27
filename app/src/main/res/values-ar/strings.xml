@@ -148,4 +148,11 @@
     <string name="tab_home_full">الصفحة الرئيسية</string>
     <string name="fullscreen">ملء الشاشة</string>
     <string name="search_btn">بحث</string>
+    <string name="mac_label">عنوان ماك</string>
+    <string name="server_port_label">رابط + المنفذ</string>
+    <string name="playlist_title">قوائم التشغيل</string>
+    <string name="welcome">أهلاً بك</string>
+    <string name="enjoy_streaming">استمتع بالمشاهدة!</string>
+    <string name="device_status">مفعّل حتى</string>
+    <string name="active_now">النشطة</string>
 </resources>

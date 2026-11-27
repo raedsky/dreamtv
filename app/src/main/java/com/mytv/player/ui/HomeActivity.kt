@@ -128,7 +128,7 @@ class HomeActivity : AppCompatActivity() {
     private fun openSection(type: ContentType) {
         if (app.prefs.profile == null) {
             Toast.makeText(this, R.string.no_playlist, Toast.LENGTH_LONG).show()
-            LoginActivity.add(this)
+            PlaylistsActivity.open(this)
             return
         }
         BrowseActivity.start(this, type)
@@ -221,7 +221,10 @@ class HomeActivity : AppCompatActivity() {
 
     // ---------------- قوائم التشغيل ----------------
 
-    private fun showPlaylists() {
+    private fun showPlaylists() = PlaylistsActivity.open(this)
+
+    @Suppress("unused")
+    private fun showPlaylistsDialog() {
         val list = app.prefs.profiles()
         val activeId = app.prefs.profile?.id
         val names = list.map { (if (it.id == activeId) "✓  " else "     ") + it.name.ifBlank { Prefs.defaultName(it) } } +

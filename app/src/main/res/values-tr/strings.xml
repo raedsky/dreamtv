@@ -145,4 +145,11 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="tab_home_full">Ana sayfa</string>
     <string name="fullscreen">Tam ekran</string>
     <string name="search_btn">Ara</string>
+    <string name="mac_label">MAC adresi</string>
+    <string name="server_port_label">Adres + port</string>
+    <string name="playlist_title">Listeler</string>
+    <string name="welcome">Hoş geldiniz</string>
+    <string name="enjoy_streaming">İyi seyirler!</string>
+    <string name="device_status">Bitiş</string>
+    <string name="active_now">Etkin</string>
 </resources>

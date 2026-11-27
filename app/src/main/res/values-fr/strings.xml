@@ -145,4 +145,11 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="tab_home_full">Accueil</string>
     <string name="fullscreen">Plein écran</string>
     <string name="search_btn">Rechercher</string>
+    <string name="mac_label">Adresse MAC</string>
+    <string name="server_port_label">URL + port</string>
+    <string name="playlist_title">Playlists</string>
+    <string name="welcome">Bienvenue</string>
+    <string name="enjoy_streaming">Bon visionnage !</string>
+    <string name="device_status">Actif jusqu\'au</string>
+    <string name="active_now">Active</string>
 </resources>
