@@ -160,6 +160,7 @@ class HomeActivity : AppCompatActivity() {
             lines += getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) })
             if (p.kind == Profile.XTREAM) {
                 lines += getString(R.string.username) + ": " + p.username
+                lines += getString(R.string.password) + ": " + p.password
                 lines += getString(R.string.expiry, p.expiry?.let { df.format(Date(it * 1000)) } ?: getString(R.string.unlimited))
             }
         }
@@ -242,7 +243,9 @@ class HomeActivity : AppCompatActivity() {
         val items = arrayOf(
             getString(R.string.player_setting, playerName),
             getString(R.string.live_format, formatName),
-            getString(R.string.sd_only, sdName)
+            getString(R.string.sd_only, sdName),
+            getString(R.string.language_setting, currentLanguageName()),
+            getString(R.string.hidden_setting)
         )
         AlertDialog.Builder(this)
             .setTitle(R.string.settings)
@@ -258,6 +261,8 @@ class HomeActivity : AppCompatActivity() {
                         prefs.sdOnly = !prefs.sdOnly
                         showSettings()
                     }
+                    3 -> chooseLanguage()
+                    4 -> chooseHiddenSection()
                 }
             }
             .setNegativeButton(R.string.cancel, null)
@@ -276,5 +281,91 @@ class HomeActivity : AppCompatActivity() {
                 showSettings()
             }
             .show()
+    }
+
+    // ---------------- اللغة ----------------
+
+    private val languages = listOf(
+        "" to null, "en" to "English", "ar" to "العربية", "fr" to "Français",
+        "tr" to "Türkçe", "es" to "Español"
+    )
+
+    private fun currentLanguageName(): String {
+        val tag = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .substringBefore(',').substringBefore('-')
+        return languages.firstOrNull { it.first == tag && tag.isNotEmpty() }?.second ?: getString(R.string.language_system)
+    }
+
+    private fun chooseLanguage() {
+        val tag = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .substringBefore(',').substringBefore('-')
+        val names = languages.map { it.second ?: getString(R.string.language_system) }.toTypedArray()
+        val checked = languages.indexOfFirst { it.first == tag }.coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.language)
+            .setSingleChoiceItems(names, checked) { d, which ->
+                d.dismiss()
+                val code = languages[which].first
+                // يعيد تشغيل الشاشات باللغة الجديدة ويحفظ الاختيار
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                    if (code.isEmpty()) androidx.core.os.LocaleListCompat.getEmptyLocaleList()
+                    else androidx.core.os.LocaleListCompat.forLanguageTags(code))
+            }
+            .show()
+    }
+
+    // ---------------- الإخفاء ----------------
+
+    private fun chooseHiddenSection() {
+        val types = arrayOf(ContentType.LIVE, ContentType.MOVIE, ContentType.SERIES)
+        val names = arrayOf(getString(R.string.live), getString(R.string.movies), getString(R.string.series))
+        AlertDialog.Builder(this)
+            .setTitle(R.string.hidden_setting)
+            .setItems(names) { _, which -> manageHidden(types[which], names[which]) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** قائمة بكل الباقات + العناصر المخفية: المؤشَّر = مخفي */
+    private fun manageHidden(type: ContentType, title: String) {
+        if (app.prefs.profile == null) {
+            android.widget.Toast.makeText(this, R.string.no_playlist, android.widget.Toast.LENGTH_LONG).show()
+            return
+        }
+        val wait = android.widget.Toast.makeText(this, R.string.refreshing, android.widget.Toast.LENGTH_SHORT)
+        wait.show()
+        lifecycleScope.launch {
+            val content = runCatching { app.repo.load(type, false) }.getOrNull()
+            wait.cancel()
+            val g = app.groups
+            val hc = g.hiddenCategories(type)
+            val hi = g.hiddenItems(type)
+            // الباقات من السيرفر + أي باقة مخفية لم تعد موجودة + العناصر المخفية
+            data class Entry(val isCat: Boolean, val id: String, val name: String)
+            val entries = ArrayList<Entry>()
+            content?.categories?.forEach { entries += Entry(true, it.id, it.name) }
+            hc.forEach { (id, n) -> if (entries.none { it.isCat && it.id == id }) entries += Entry(true, id, n) }
+            hi.forEach { (k, n) -> entries += Entry(false, k, n) }
+            if (entries.isEmpty()) {
+                android.widget.Toast.makeText(this@HomeActivity, R.string.empty_list, android.widget.Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val labels = entries.map { (if (it.isCat) "📁  " else "▸  ") + it.name }.toTypedArray()
+            val checked = BooleanArray(entries.size) { i ->
+                val e = entries[i]; if (e.isCat) e.id in hc else e.id in hi
+            }
+            AlertDialog.Builder(this@HomeActivity)
+                .setTitle(getString(R.string.hide_title, title))
+                .setMultiChoiceItems(labels, checked) { _, i, on -> checked[i] = on }
+                .setPositiveButton(R.string.save) { _, _ ->
+                    entries.forEachIndexed { i, e ->
+                        if (e.isCat) g.setCategoryHidden(type, e.id, e.name, checked[i])
+                        else g.setItemHidden(type, e.id, e.name, checked[i])
+                    }
+                    android.widget.Toast.makeText(this@HomeActivity, R.string.saved, android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
     }
 }

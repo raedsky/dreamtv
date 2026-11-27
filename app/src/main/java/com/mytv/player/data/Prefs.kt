@@ -121,9 +121,7 @@ class Prefs(context: Context) {
         const val PLAYER_EXTERNAL = "external"
 
         fun defaultName(p: Profile): String =
-            if (p.kind == Profile.XTREAM) {
-                p.server.substringAfter("://").substringBefore('/').substringBefore(':')
-                    .ifBlank { "Xtream" }
-            } else "M3U"
+            // لا نعرض الهوست للمستخدم — اسم المستخدم فقط
+            if (p.kind == Profile.XTREAM) p.username.ifBlank { "Xtream" } else "M3U"
     }
 }

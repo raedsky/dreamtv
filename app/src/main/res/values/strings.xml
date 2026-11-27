@@ -122,4 +122,12 @@
     <string name="continue_ep">Continue %1$s</string>
     <string name="last_update">Updated %1$s</string>
     <string name="added_on">Added %1$s</string>
+    <string name="hide_item">Hide</string>
+    <string name="hide_category">Hide this category</string>
+    <string name="hidden_done">Hidden. You can show it again from Settings → Hide / show.</string>
+    <string name="hidden_setting">Hide / show content</string>
+    <string name="hide_title">Hidden in %1$s (checked = hidden)</string>
+    <string name="language">Language</string>
+    <string name="language_setting">Language: %1$s</string>
+    <string name="language_system">Device language</string>
 </resources>

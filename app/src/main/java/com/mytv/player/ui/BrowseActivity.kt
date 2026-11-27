@@ -60,6 +60,27 @@ class BrowseActivity : AppCompatActivity() {
 
     private var content: Repository.Content? = null
     private var index: Map<String, StreamItem> = emptyMap()
+    private var rawContent: Repository.Content? = null
+
+    /** المحتوى بعد حذف الباقات والعناصر المخفية من الإعدادات */
+    private fun visibleContent(): Repository.Content {
+        val raw = rawContent ?: return Repository.Content(emptyList(), emptyList())
+        val hc = app.groups.hiddenCategories(type).keys
+        val hi = app.groups.hiddenItems(type).keys
+        if (hc.isEmpty() && hi.isEmpty()) return raw
+        return Repository.Content(
+            raw.categories.filter { it.id !in hc },
+            raw.items.filter { it.key !in hi && it.categoryId !in hc }
+        )
+    }
+
+    /** بعد إخفاء شيء: نعيد الفلترة ونحدّث القوائم */
+    private fun reapplyHidden() {
+        val c = visibleContent()
+        content = c
+        index = c.items.associateBy { it.key }
+        refresh(reloadItems = true)
+    }
     private var favSet: Set<String> = emptySet()
     private var current: CategoryRow? = null
     private var currentItems: List<StreamItem> = emptyList()
@@ -134,7 +155,8 @@ class BrowseActivity : AppCompatActivity() {
         tvEmpty.isVisible = false
         lifecycleScope.launch {
             try {
-                val c = app.repo.load(type, force)
+                rawContent = app.repo.load(type, force)
+                val c = visibleContent()
                 content = c
                 index = c.items.associateBy { it.key }
                 refresh(reloadItems = true)
@@ -297,15 +319,25 @@ class BrowseActivity : AppCompatActivity() {
                 }
                 .show()
             Kind.GROUP -> groupOptions(row)
-            Kind.SERVER -> {
-                // إضافة كل عناصر التصنيف إلى قروب خاص دفعة واحدة
-                val keys = content?.items?.filter { it.categoryId == row.id }?.map { it.key } ?: return
-                chooseGroupFor(getString(R.string.add_category_to_group, row.name)) { g ->
-                    val n = app.groups.addAll(type, g.id, keys)
-                    refresh(reloadItems = current?.key == "${Kind.GROUP.name}:${g.id}")
-                    Toast.makeText(this, getString(R.string.added_n, n), Toast.LENGTH_SHORT).show()
+            Kind.SERVER -> AlertDialog.Builder(this)
+                .setTitle(row.name)
+                .setItems(arrayOf(getString(R.string.add_category_to_group, row.name), getString(R.string.hide_category))) { _, which ->
+                    if (which == 0) {
+                        // إضافة كل عناصر التصنيف إلى قروب خاص دفعة واحدة
+                        val keys = content?.items?.filter { it.categoryId == row.id }?.map { it.key } ?: return@setItems
+                        chooseGroupFor(getString(R.string.add_category_to_group, row.name)) { g ->
+                            val n = app.groups.addAll(type, g.id, keys)
+                            refresh(reloadItems = current?.key == "${Kind.GROUP.name}:${g.id}")
+                            Toast.makeText(this, getString(R.string.added_n, n), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        app.groups.setCategoryHidden(type, row.id, row.name, true)
+                        if (current?.key == row.key) current = null
+                        reapplyHidden()
+                        Toast.makeText(this, R.string.hidden_done, Toast.LENGTH_LONG).show()
+                    }
                 }
-            }
+                .show()
             else -> Unit
         }
     }
@@ -348,6 +380,8 @@ class BrowseActivity : AppCompatActivity() {
         if (inGroup != null) labels += getString(R.string.remove_from_group, inGroup.name)
         val infoIndex = labels.size
         labels += getString(R.string.image_info)
+        val hideIndex = labels.size
+        labels += getString(R.string.hide_item)
 
         AlertDialog.Builder(this)
             .setTitle(item.name)
@@ -359,6 +393,11 @@ class BrowseActivity : AppCompatActivity() {
                     }
                     1 -> chooseGroups(item)
                     infoIndex -> showImageInfo(item)
+                    hideIndex -> {
+                        app.groups.setItemHidden(type, item.key, item.name, true)
+                        reapplyHidden()
+                        Toast.makeText(this, R.string.hidden_done, Toast.LENGTH_LONG).show()
+                    }
                     2 -> if (inGroup != null) {
                         app.groups.setMember(type, inGroup.id, item.key, false)
                         refresh(reloadItems = true)

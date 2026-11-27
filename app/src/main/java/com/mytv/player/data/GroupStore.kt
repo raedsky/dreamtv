@@ -104,4 +104,31 @@ class GroupStore(context: Context) {
         sp.edit().putString("f_${type.name}", gson.toJson(list)).apply()
         return nowFav
     }
+
+    // ---------- العناصر والباقات المخفية ----------
+
+    private val mapType = object : TypeToken<LinkedHashMap<String, String>>() {}.type
+
+    private fun readMap(name: String): LinkedHashMap<String, String> {
+        val json = sp.getString(name, null) ?: return LinkedHashMap()
+        return runCatching { gson.fromJson<LinkedHashMap<String, String>>(json, mapType) }.getOrNull() ?: LinkedHashMap()
+    }
+
+    /** الباقات (تصنيفات السيرفر) المخفية: id -> الاسم */
+    fun hiddenCategories(type: ContentType): LinkedHashMap<String, String> = readMap("hc_${type.name}")
+
+    /** العناصر المخفية (قنوات/أفلام/مسلسلات): key -> الاسم */
+    fun hiddenItems(type: ContentType): LinkedHashMap<String, String> = readMap("hi_${type.name}")
+
+    fun setCategoryHidden(type: ContentType, id: String, name: String, hidden: Boolean) {
+        val m = hiddenCategories(type)
+        if (hidden) m[id] = name else m.remove(id)
+        sp.edit().putString("hc_${type.name}", gson.toJson(m)).apply()
+    }
+
+    fun setItemHidden(type: ContentType, key: String, name: String, hidden: Boolean) {
+        val m = hiddenItems(type)
+        if (hidden) m[key] = name else m.remove(key)
+        sp.edit().putString("hi_${type.name}", gson.toJson(m)).apply()
+    }
 }

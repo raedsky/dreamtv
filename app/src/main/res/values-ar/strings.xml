@@ -122,4 +122,12 @@
     <string name="continue_ep">متابعة %1$s</string>
     <string name="last_update">آخر تحديث: %1$s</string>
     <string name="added_on">أضيف: %1$s</string>
+    <string name="hide_item">إخفاء</string>
+    <string name="hide_category">إخفاء هذه الباقة</string>
+    <string name="hidden_done">تم الإخفاء. تقدر ترجعه من الإعدادات ← إخفاء / إظهار.</string>
+    <string name="hidden_setting">إخفاء / إظهار المحتوى</string>
+    <string name="hide_title">المخفي في %1$s (المؤشَّر = مخفي)</string>
+    <string name="language">اللغة</string>
+    <string name="language_setting">اللغة: %1$s</string>
+    <string name="language_system">لغة الجهاز</string>
 </resources>
