@@ -107,10 +107,14 @@ class Prefs(context: Context) {
         return before != after?.id || beforeActive != after
     }
 
-    /** ترتيب العناصر: "default" (ترتيب السيرفر) أو "added" (الأحدث) أو "name" (أبجدي) */
-    var sortMode: String
-        get() = sp.getString("sort", "default") ?: "default"
-        set(v) { sp.edit().putString("sort", v).apply() }
+    /**
+     * ترتيب العناصر: "default" (ترتيب السيرفر) أو "added" (الأحدث) أو "name" (أبجدي).
+     * الأفلام والمسلسلات افتراضياً "الأحدث" حتى يظهر الجديد أول الباقة وأول الكل.
+     */
+    fun sortMode(type: ContentType): String =
+        sp.getString("sort_${type.name}", null) ?: if (type == ContentType.LIVE) "default" else "added"
+
+    fun setSortMode(type: ContentType, v: String) { sp.edit().putString("sort_${type.name}", v).apply() }
 
     companion object {
         const val PLAYER_INTERNAL = "internal"

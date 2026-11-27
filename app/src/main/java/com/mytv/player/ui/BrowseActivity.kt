@@ -215,7 +215,7 @@ class BrowseActivity : AppCompatActivity() {
                    else currentItems.filter { it.name.contains(q, ignoreCase = true) }
         // القروبات والمفضلة تبقى بترتيب المستخدم
         if (current?.kind != Kind.GROUP && current?.kind != Kind.FAVORITES && current?.kind != Kind.RECENT && current?.kind != Kind.LATEST) {
-            list = when (app.prefs.sortMode) {
+            list = when (app.prefs.sortMode(type)) {
                 "added" -> list.sortedByDescending { it.added }
                 "name" -> list.sortedBy { it.name.lowercase() }
                 else -> list
@@ -252,7 +252,7 @@ class BrowseActivity : AppCompatActivity() {
     })
 
     private fun updateSortLabel() {
-        btnSort.text = getString(R.string.sort_by, sortLabel(app.prefs.sortMode))
+        btnSort.text = getString(R.string.sort_by, sortLabel(app.prefs.sortMode(type)))
     }
 
     private fun chooseSort() {
@@ -260,8 +260,8 @@ class BrowseActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(R.string.sort)
             .setSingleChoiceItems(modes.map { sortLabel(it) }.toTypedArray(),
-                modes.indexOf(app.prefs.sortMode).coerceAtLeast(0)) { d, which ->
-                app.prefs.sortMode = modes[which]
+                modes.indexOf(app.prefs.sortMode(type)).coerceAtLeast(0)) { d, which ->
+                app.prefs.setSortMode(type, modes[which])
                 updateSortLabel()
                 applyFilter()
                 d.dismiss()
