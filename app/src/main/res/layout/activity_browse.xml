@@ -1,186 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:tag="bg"
-    android:orientation="vertical">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <!-- الشريط العلوي -->
+    <com.mytv.player.ui.StreaksView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:alpha="0.45" />
+
     <LinearLayout
-        android:layout_width="match_parent" android:layout_height="68dp"
-        android:gravity="center_vertical" android:orientation="horizontal"
-        android:paddingStart="20dp" android:paddingEnd="20dp">
-        <ImageButton
-            android:id="@+id/btnBack"
-            style="@style/IboIconBtn"
-            android:layout_marginStart="0dp"
-            android:contentDescription="@string/back"
-            android:src="@drawable/ic_back" />
-        <ImageView
-            android:id="@+id/ivSection"
-            android:layout_width="30dp" android:layout_height="30dp"
-            android:layout_marginStart="16dp"
-            android:tint="@color/accent"
-            android:src="@drawable/ic_live" />
-        <TextView
-            android:id="@+id/tvSection"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textAllCaps="true"
-            android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
-
+        <!-- الشريط العلوي: التبويبات | البحث | الشعار -->
         <LinearLayout
-            android:layout_width="300dp" android:layout_height="44dp"
-            android:tag="search"
+            android:layout_width="match_parent" android:layout_height="80dp"
             android:gravity="center_vertical" android:orientation="horizontal"
-            android:paddingStart="14dp" android:paddingEnd="10dp">
+            android:paddingStart="24dp" android:paddingEnd="24dp">
+            <TextView android:id="@+id/tabHome" style="@style/TopTabItem" android:text="@string/tab_home_full" />
+            <View style="@style/TopTabSep" />
+            <TextView android:id="@+id/tabLive" style="@style/TopTabItem" android:text="@string/tab_live" />
+            <View style="@style/TopTabSep" />
+            <TextView android:id="@+id/tabMovies" style="@style/TopTabItem" android:text="@string/tab_movies" />
+            <View style="@style/TopTabSep" />
+            <TextView android:id="@+id/tabSeries" style="@style/TopTabItem" android:text="@string/tab_series" />
+            <View style="@style/TopTabSep" />
+
+            <LinearLayout
+                android:layout_width="310dp" android:layout_height="42dp"
+                android:layout_marginStart="24dp"
+                android:tag="search"
+                android:gravity="center_vertical" android:orientation="horizontal"
+                android:paddingStart="14dp" android:paddingEnd="10dp">
+                <ImageView
+                    android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@drawable/ic_search" />
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/search" android:imeOptions="actionSearch"
+                    android:inputType="text" android:maxLines="1"
+                    android:textColor="@color/text_primary" android:textColorHint="#66FFFFFF"
+                    android:textSize="15sp" />
+            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btnSortIcon"
+                style="@style/IboIconBtn"
+                android:layout_marginStart="12dp"
+                android:contentDescription="@string/sort"
+                android:src="@drawable/ic_sort" />
+            <ImageButton
+                android:id="@+id/btnRefresh"
+                style="@style/IboIconBtn"
+                android:contentDescription="@string/reload"
+                android:src="@drawable/ic_reload" />
+
+            <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+
+            <TextClock
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:format12Hour="hh:mm a" android:format24Hour="HH:mm"
+                android:textColor="@color/text_secondary" android:textSize="16sp" />
             <ImageView
-                android:layout_width="20dp" android:layout_height="20dp"
-                android:alpha="0.7" android:src="@drawable/ic_search" />
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="match_parent" android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/search" android:imeOptions="actionSearch"
-                android:inputType="text" android:maxLines="1"
-                android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary"
-                android:textSize="15sp" />
+                android:layout_width="70dp" android:layout_height="56dp"
+                android:scaleType="fitCenter" android:src="@drawable/ic_launcher" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/btnSort"
-            android:layout_width="wrap_content" android:layout_height="44dp"
-            android:layout_marginStart="10dp"
-            android:tag="btn"
-            android:clickable="true" android:focusable="true"
-            android:gravity="center"
-            android:paddingStart="16dp" android:paddingEnd="16dp"
-            android:textColor="@color/text_primary" android:textSize="14sp" />
-        <ImageButton
-            android:id="@+id/btnRefresh"
-            style="@style/IboIconBtn"
-            android:layout_marginStart="10dp"
-            android:contentDescription="@string/reload"
-            android:src="@drawable/ic_reload" />
-        <TextClock
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:format12Hour="hh:mm a" android:format24Hour="HH:mm"
-            android:textColor="@color/text_primary" android:textSize="20sp" android:textStyle="bold" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-        android:orientation="horizontal"
-        android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingBottom="16dp">
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF" />
 
-        <!-- التصنيفات -->
         <LinearLayout
-            android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2.6"
-            android:tag="panel"
-            android:orientation="vertical" android:padding="8dp">
-            <TextView
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="@string/categories" android:textAllCaps="true"
-                android:textColor="@color/text_secondary" android:textSize="12sp" android:textStyle="bold" />
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <!-- الباقات -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCategories"
-                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2.3"
+                android:clipToPadding="false" android:padding="6dp"
                 android:descendantFocusability="afterDescendants"
                 android:scrollbars="none" />
-        </LinearLayout>
 
-        <!-- العناصر -->
-        <LinearLayout
-            android:id="@+id/itemsPane"
-            android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="7.4"
-            android:layout_marginStart="14dp"
-            android:tag="panel"
-            android:orientation="vertical" android:padding="8dp">
-            <TextView
-                android:id="@+id/tvHeader"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:ellipsize="end" android:maxLines="1" android:padding="8dp"
-                android:tag="accent" android:textSize="16sp" android:textStyle="bold" />
-            <FrameLayout
-                android:layout_width="match_parent" android:layout_height="match_parent">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvItems"
-                    android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:clipToPadding="false" android:padding="4dp"
-                    android:descendantFocusability="afterDescendants"
-                    android:scrollbars="none" />
-                <ProgressBar
-                    android:id="@+id/progress"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
-                <TextView
-                    android:id="@+id/tvEmpty"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_gravity="center" android:gravity="center" android:padding="24dp"
-                    android:textColor="@color/text_secondary" android:textSize="16sp"
-                    android:visibility="gone" />
-            </FrameLayout>
-        </LinearLayout>
+            <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#33FFFFFF" />
 
-        <!-- المعاينة + دليل البرامج (المباشر فقط) -->
-        <LinearLayout
-            android:id="@+id/previewPane"
-            android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0"
-            android:layout_marginStart="14dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-            <FrameLayout
-                android:id="@+id/previewBox"
-                android:layout_width="match_parent" android:layout_height="200dp"
-                android:background="@drawable/bg_preview"
-                android:clickable="true" android:focusable="false">
-                <androidx.media3.ui.PlayerView
-                    android:id="@+id/previewPlayer"
-                    android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:focusable="false"
-                    app:use_controller="false"
-                    app:show_buffering="when_playing" />
-                <TextView
-                    android:id="@+id/previewHint"
-                    android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:gravity="center" android:padding="16dp"
-                    android:text="@string/preview_hint"
-                    android:textColor="@color/text_secondary" android:textSize="14sp" />
-            </FrameLayout>
+            <!-- القنوات / البوسترات -->
             <LinearLayout
-                android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-                android:layout_marginTop="12dp"
-                android:tag="panel"
-                android:orientation="vertical" android:padding="12dp">
+                android:id="@+id/itemsPane"
+                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="7.7"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:id="@+id/headerRow"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center_vertical" android:orientation="horizontal"
+                    android:paddingStart="14dp" android:paddingTop="8dp" android:paddingEnd="14dp">
+                    <TextView
+                        android:id="@+id/tvHeader"
+                        android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:ellipsize="end" android:maxLines="1"
+                        android:tag="accent"
+                        android:textSize="16sp" android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/btnSort"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
+                </LinearLayout>
+                <FrameLayout
+                    android:layout_width="match_parent" android:layout_height="match_parent">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvItems"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:clipToPadding="false" android:padding="6dp"
+                        android:descendantFocusability="afterDescendants"
+                        android:scrollbars="none" />
+                    <ProgressBar
+                        android:id="@+id/progress"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+                    <TextView
+                        android:id="@+id/tvEmpty"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_gravity="center" android:gravity="center" android:padding="24dp"
+                        android:textColor="@color/text_secondary" android:textSize="16sp"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/previewSep"
+                android:layout_width="1dp" android:layout_height="match_parent"
+                android:background="#33FFFFFF" android:visibility="gone" />
+
+            <!-- المعاينة (المباشر فقط) -->
+            <LinearLayout
+                android:id="@+id/previewPane"
+                android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <FrameLayout
+                    android:id="@+id/previewBox"
+                    android:layout_width="match_parent" android:layout_height="220dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#FF000000"
+                    android:clickable="true" android:focusable="false">
+                    <androidx.media3.ui.PlayerView
+                        android:id="@+id/previewPlayer"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:focusable="false"
+                        app:use_controller="false"
+                        app:show_buffering="when_playing" />
+                    <TextView
+                        android:id="@+id/previewHint"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:gravity="center" android:padding="16dp"
+                        android:text="@string/preview_hint"
+                        android:textColor="@color/text_secondary" android:textSize="14sp" />
+                </FrameLayout>
                 <TextView
                     android:id="@+id/previewTitle"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:paddingStart="12dp" android:paddingEnd="12dp"
                     android:maxLines="1" android:ellipsize="end"
-                    android:textColor="@color/text_primary" android:textSize="18sp" android:textStyle="bold" />
+                    android:textColor="@color/text_primary" android:textSize="24sp" android:textStyle="bold" />
                 <TextView
                     android:id="@+id/previewCategory"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:paddingStart="12dp" android:paddingEnd="12dp"
                     android:maxLines="1" android:ellipsize="end"
                     android:tag="accent" android:textSize="13sp" />
-                <TextView
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/tv_guide" android:textAllCaps="true"
-                    android:textColor="@color/text_secondary" android:textSize="12sp" android:textStyle="bold" />
                 <ScrollView
-                    android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:layout_marginTop="6dp" android:focusable="false" android:scrollbars="none">
+                    android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+                    android:layout_marginTop="10dp"
+                    android:focusable="false" android:scrollbars="none"
+                    android:paddingStart="12dp" android:paddingEnd="12dp">
                     <LinearLayout
                         android:id="@+id/epgList"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" />
                 </ScrollView>
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="end" android:orientation="horizontal"
+                    android:padding="12dp">
+                    <TextView android:id="@+id/btnFullscreen" style="@style/CellButton" android:text="@string/fullscreen" />
+                    <TextView android:id="@+id/btnPreviewFav" style="@style/CellButton" android:text="@string/add_favorite" />
+                    <TextView android:id="@+id/btnSearch" style="@style/CellButton" android:text="@string/search_btn" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

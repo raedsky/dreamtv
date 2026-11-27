@@ -142,4 +142,7 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="sd_only_title">Qualité SD uniquement</string>
     <string name="update_now">Mettre à jour</string>
     <string name="mac_address">Adresse MAC : %1$s</string>
+    <string name="tab_home_full">Accueil</string>
+    <string name="fullscreen">Plein écran</string>
+    <string name="search_btn">Rechercher</string>
 </resources>

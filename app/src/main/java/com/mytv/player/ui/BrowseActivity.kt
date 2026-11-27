@@ -99,24 +99,8 @@ class BrowseActivity : AppCompatActivity() {
             .getOrDefault(ContentType.LIVE)
         setContentView(R.layout.activity_browse)
 
-        findViewById<TextView>(R.id.tvSection).setText(
-            when (type) {
-                ContentType.LIVE -> R.string.live
-                ContentType.MOVIE -> R.string.movies
-                ContentType.SERIES -> R.string.series
-            }
-        )
         ThemeUi.apply(findViewById(android.R.id.content))
-        findViewById<android.widget.ImageView>(R.id.ivSection).imageTintList =
-            android.content.res.ColorStateList.valueOf(com.mytv.player.data.Themes.current.accent)
-        findViewById<android.widget.ImageView>(R.id.ivSection).setImageResource(
-            when (type) {
-                ContentType.LIVE -> R.drawable.ic_live
-                ContentType.MOVIE -> R.drawable.ic_movie
-                ContentType.SERIES -> R.drawable.ic_series
-            }
-        )
-        findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
+        setupTabs()
         rvCategories = findViewById(R.id.rvCategories)
         rvItems = findViewById(R.id.rvItems)
         etSearch = findViewById(R.id.etSearch)
@@ -124,6 +108,7 @@ class BrowseActivity : AppCompatActivity() {
         tvHeader = findViewById(R.id.tvHeader)
         btnSort = findViewById(R.id.btnSort)
         btnSort.setOnClickListener { chooseSort() }
+        findViewById<View>(R.id.btnSortIcon).setOnClickListener { chooseSort() }
         updateSortLabel()
         progress = findViewById(R.id.progress)
 
@@ -541,14 +526,53 @@ class BrowseActivity : AppCompatActivity() {
         previewCategory = findViewById(R.id.previewCategory)
 
         pane.isVisible = true
-        (findViewById<View>(R.id.itemsPane).layoutParams as LinearLayout.LayoutParams).weight = 3.6f
-        (pane.layoutParams as LinearLayout.LayoutParams).weight = 3.8f
+        findViewById<View>(R.id.previewSep).isVisible = true
+        (findViewById<View>(R.id.itemsPane).layoutParams as LinearLayout.LayoutParams).weight = 3.0f
+        (pane.layoutParams as LinearLayout.LayoutParams).weight = 4.7f
         pane.requestLayout()
+        findViewById<View>(R.id.btnFullscreen).setOnClickListener { previewItem?.let { openItem(it, 0) } }
+        findViewById<View>(R.id.btnSearch).setOnClickListener {
+            etSearch.requestFocus()
+            (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                .showSoftInput(etSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
+        findViewById<TextView>(R.id.btnPreviewFav).setOnClickListener {
+            val item = previewItem ?: return@setOnClickListener
+            app.groups.toggleFavorite(type, item.key)
+            refresh(reloadItems = current?.kind == Kind.FAVORITES)
+            updatePreviewFav()
+        }
+        for (id in intArrayOf(R.id.btnFullscreen, R.id.btnPreviewFav, R.id.btnSearch)) {
+            findViewById<View>(id).isFocusable = true
+        }
         // مقاس 16:9
         box.post {
             box.layoutParams = box.layoutParams.apply { height = box.width * 9 / 16 }
         }
         box.setOnClickListener { previewItem?.let { openItem(it, 0) } }
+    }
+
+    private fun updatePreviewFav() {
+        val item = previewItem ?: return
+        val fav = item.key in app.groups.favorites(type)
+        findViewById<TextView>(R.id.btnPreviewFav).setText(if (fav) R.string.remove_favorite else R.string.add_favorite)
+    }
+
+    /** تبويبات: الرئيسية | مباشر | أفلام | مسلسل */
+    private fun setupTabs() {
+        val tabs = mapOf(R.id.tabLive to ContentType.LIVE, R.id.tabMovies to ContentType.MOVIE, R.id.tabSeries to ContentType.SERIES)
+        findViewById<View>(R.id.tabHome).setOnClickListener { finish() }
+        for ((id, t) in tabs) {
+            val v = findViewById<View>(id)
+            v.isSelected = t == type
+            v.setOnClickListener {
+                if (t != type) {
+                    start(this, t)
+                    finish()
+                    overridePendingTransition(0, 0)
+                }
+            }
+        }
     }
 
     private fun startPreview(item: StreamItem) {
@@ -563,6 +587,8 @@ class BrowseActivity : AppCompatActivity() {
         p.playWhenReady = true
         previewHint.isVisible = false
         previewTitle.text = item.name
+        itemAdapter.selectedKey = item.key
+        updatePreviewFav()
         previewCategory.text = content?.categories?.firstOrNull { it.id == item.categoryId }?.name.orEmpty()
         loadEpg(item)
     }

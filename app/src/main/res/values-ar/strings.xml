@@ -145,4 +145,7 @@
     <string name="sd_only_title">جودة SD فقط</string>
     <string name="update_now">تحديث الآن</string>
     <string name="mac_address">عنوان ماك: %1$s</string>
+    <string name="tab_home_full">الصفحة الرئيسية</string>
+    <string name="fullscreen">ملء الشاشة</string>
+    <string name="search_btn">بحث</string>
 </resources>

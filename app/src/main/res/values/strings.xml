@@ -145,4 +145,7 @@
     <string name="sd_only_title">SD quality only</string>
     <string name="update_now">Update now</string>
     <string name="mac_address">MAC address: %1$s</string>
+    <string name="tab_home_full">Home</string>
+    <string name="fullscreen">Full screen</string>
+    <string name="search_btn">Search</string>
 </resources>

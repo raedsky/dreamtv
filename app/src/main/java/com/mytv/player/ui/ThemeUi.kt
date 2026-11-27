@@ -89,6 +89,29 @@ object ThemeUi {
         shape(ctx, 22f, 0x1FFFFFFF)
     )
 
+    /** خلية رمادية داكنة مثل قوائم Dream TV */
+    fun cell(ctx: Context) = states(
+        shape(ctx, 4f, 0xF2383842.toInt(), t.accent, 2f),
+        shape(ctx, 4f, 0xD92A2A31.toInt()),
+        shape(ctx, 4f, 0xE6303038.toInt())
+    )
+
+    fun cellBtn(ctx: Context) = states(
+        shape(ctx, 6f, t.accent, 0xFFFFFFFF.toInt(), 1.5f),
+        shape(ctx, 6f, 0xCC1E1E24.toInt(), 0x40FFFFFF, 1f)
+    )
+
+    fun topTab(ctx: Context) = states(
+        shape(ctx, 10f, 0x26FFFFFF),
+        shape(ctx, 10f, 0x00000000)
+    )
+
+    /** نص الخلية: المحدد بلون الثيم */
+    fun selectableText() = ColorStateList(
+        arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(android.R.attr.state_focused), intArrayOf()),
+        intArrayOf(t.accent, 0xFFFFFFFF.toInt(), 0xFFFFFFFF.toInt())
+    )
+
     fun bg() = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(t.bg, t.bgEnd))
 
     /** يمر على كل الشاشة ويطبّق الثيم حسب android:tag */
@@ -107,6 +130,15 @@ object ThemeUi {
             "tab" -> v.background = tab(ctx)
             "search" -> v.background = search(ctx)
             "accent" -> (v as? TextView)?.setTextColor(t.accent)
+            "cell" -> v.background = cell(ctx)
+            "cellbtn" -> v.background = cellBtn(ctx)
+            "celltext" -> (v as? TextView)?.setTextColor(selectableText())
+            "toptab" -> {
+                v.background = topTab(ctx)
+                (v as? TextView)?.setTextColor(ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf()),
+                    intArrayOf(t.accent, 0xD9FFFFFF.toInt())))
+            }
             "progress" -> (v as? ProgressBar)?.progressTintList = ColorStateList.valueOf(t.accent)
         }
         if (v is ViewGroup) for (i in 0 until v.childCount) apply(v.getChildAt(i))

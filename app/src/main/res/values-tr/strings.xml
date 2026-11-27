@@ -142,4 +142,7 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="sd_only_title">Yalnızca SD kalite</string>
     <string name="update_now">Şimdi güncelle</string>
     <string name="mac_address">MAC adresi: %1$s</string>
+    <string name="tab_home_full">Ana sayfa</string>
+    <string name="fullscreen">Tam ekran</string>
+    <string name="search_btn">Ara</string>
 </resources>

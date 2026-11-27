@@ -155,6 +155,15 @@ class ItemAdapter(
     var items: List<StreamItem> = emptyList()
         private set
 
+    /** القناة المعروضة في المعاينة (تظهر بلون الثيم) */
+    var selectedKey: String? = null
+        set(v) {
+            val old = field
+            field = v
+            items.indexOfFirst { it.key == old }.takeIf { it >= 0 }?.let { notifyItemChanged(it) }
+            items.indexOfFirst { it.key == v }.takeIf { it >= 0 }?.let { notifyItemChanged(it) }
+        }
+
     fun submit(list: List<StreamItem>) {
         items = list
         notifyDataSetChanged()
@@ -194,6 +203,7 @@ class ItemAdapter(
         h.name.text = item.name
         h.fav.isVisible = item.key in favorites()
         h.num?.text = (if (item.num > 0) item.num else position + 1).toString()
+        h.itemView.isSelected = item.key == selectedKey
         h.rating?.let { r ->
             r.isVisible = !item.rating.isNullOrBlank()
             r.text = "★ ${item.rating}"

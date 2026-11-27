@@ -142,4 +142,7 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="sd_only_title">Solo calidad SD</string>
     <string name="update_now">Actualizar ahora</string>
     <string name="mac_address">Dirección MAC: %1$s</string>
+    <string name="tab_home_full">Inicio</string>
+    <string name="fullscreen">Pantalla completa</string>
+    <string name="search_btn">Buscar</string>
 </resources>
