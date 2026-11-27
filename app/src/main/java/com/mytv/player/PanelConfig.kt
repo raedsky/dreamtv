@@ -14,6 +14,9 @@ object PanelConfig {
      */
     const val API_KEY = ""
 
+    /** كود الموزّع (يُعبّأ تلقائياً من APK Builder لكل موزّع) — فارغ = التطبيق الرئيسي */
+    const val RESELLER = ""
+
     /** السيرفر الافتراضي إذا لم تصل قائمة السيرفرات من اللوحة بعد */
     const val DEFAULT_SERVER = "http://dreammax.lol"
     const val DEFAULT_SERVER_NAME = "DreamMax"

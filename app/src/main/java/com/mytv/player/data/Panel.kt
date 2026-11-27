@@ -66,7 +66,8 @@ object Panel {
         val url = PanelConfig.API_URL +
             (if ('?' in PanelConfig.API_URL) "&" else "?") +
             "key=${e(PanelConfig.API_KEY)}&mac=${e(mac)}&dkey=${e(key)}" +
-            "&model=${e("${Build.MANUFACTURER} ${Build.MODEL}")}&v=${e(version)}"
+            "&model=${e("${Build.MANUFACTURER} ${Build.MODEL}")}&v=${e(version)}" +
+            (if (PanelConfig.RESELLER.isNotBlank()) "&r=${e(PanelConfig.RESELLER)}" else "")
         runCatching {
             App.http.newCall(Request.Builder().url(url).build()).execute().use { r ->
                 val body = r.body?.string() ?: return@use null

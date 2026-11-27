@@ -81,6 +81,9 @@ if api_url and re.match(r'https?://', api_url):
     pc = re.sub(r'const val API_URL = "[^"]*"', lambda m: f'const val API_URL = "{kt_escape(api_url)}"', pc)
 if server and re.match(r'https?://', server):
     pc = re.sub(r'const val DEFAULT_SERVER = "[^"]*"', lambda m: f'const val DEFAULT_SERVER = "{kt_escape(server.rstrip("/"))}"', pc)
+reseller = (cfg.get('reseller') or '').strip()
+if re.fullmatch(r'[A-Za-z0-9]{4,16}', reseller):
+    pc = re.sub(r'const val RESELLER = "[^"]*"', lambda m: f'const val RESELLER = "{reseller}"', pc)
 if server_name:
     pc = re.sub(r'const val DEFAULT_SERVER_NAME = "[^"]*"', lambda m: f'const val DEFAULT_SERVER_NAME = "{kt_escape(server_name)}"', pc)
 write(pc_path, pc)
