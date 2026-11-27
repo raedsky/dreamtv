@@ -97,6 +97,27 @@ class Repository(private val prefs: Prefs) {
         xtream(p).seriesEpisodes(item.id)
     }
 
+    /** تفاصيل الفيلم (Xtream فقط) */
+    suspend fun vodInfo(item: StreamItem): MediaInfo? = withContext(Dispatchers.IO) {
+        val p = prefs.profile?.takeIf { it.kind == Profile.XTREAM } ?: return@withContext null
+        if (!item.key.startsWith("M:")) return@withContext null
+        runCatching { xtream(p).vodInfo(item.id) }.getOrNull()
+    }
+
+    /** تفاصيل المسلسل + الحلقات */
+    suspend fun seriesDetails(item: StreamItem): Pair<MediaInfo?, List<Episode>> = withContext(Dispatchers.IO) {
+        if (item.key.startsWith(M3U_SERIES)) return@withContext null to (m3uEpisodes[item.key] ?: emptyList())
+        val p = prefs.profile ?: throw IOException("Not logged in")
+        xtream(p).seriesDetails(item.id)
+    }
+
+    /** دليل البرامج للقناة (Xtream فقط) */
+    suspend fun epg(item: StreamItem): List<EpgEntry> = withContext(Dispatchers.IO) {
+        val p = prefs.profile?.takeIf { it.kind == Profile.XTREAM } ?: return@withContext emptyList()
+        if (!item.key.startsWith("L:")) return@withContext emptyList()
+        runCatching { xtream(p).shortEpg(item.id) }.getOrDefault(emptyList())
+    }
+
     /** تاريخ انتهاء اشتراك Xtream بدون مسح البيانات المحمّلة. */
     suspend fun fetchExpiry(p: Profile): Long? = withContext(Dispatchers.IO) {
         runCatching { xtream(p).authenticate() }.getOrNull()

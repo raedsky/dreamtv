@@ -129,7 +129,7 @@ class CategoryAdapter(
         val ctx = h.itemView.context
         h.name.text = when (r.kind) {
             CategoryRow.Kind.RECENT -> "↺  ${r.name}"
-            CategoryRow.Kind.FAVORITES -> "★  ${r.name}"
+            CategoryRow.Kind.FAVORITES -> "♥  ${r.name}"
             CategoryRow.Kind.GROUP -> "▣  ${r.name}"
             CategoryRow.Kind.ADD_GROUP -> "＋  ${r.name}"
             else -> r.name
@@ -168,17 +168,33 @@ class ItemAdapter(
         val image: ImageView = v.findViewById(R.id.ivImage)
         val name: TextView = v.findViewById(R.id.tvName)
         val fav: TextView = v.findViewById(R.id.tvFav)
+        val num: TextView? = v.findViewById(R.id.tvNum)
+        val rating: TextView? = v.findViewById(R.id.tvRating)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val layout = if (type == ContentType.LIVE) R.layout.item_channel else R.layout.item_poster
-        return VH(LayoutInflater.from(parent.context).inflate(layout, parent, false))
+        val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        if (type != ContentType.LIVE) {
+            // تكبير البوستر المحدد مثل IBO
+            v.setOnFocusChangeListener { view, has ->
+                val s = if (has) 1.07f else 1f
+                view.animate().scaleX(s).scaleY(s).setDuration(120).start()
+                view.translationZ = if (has) 8f else 0f
+            }
+        }
+        return VH(v)
     }
 
     override fun onBindViewHolder(h: VH, position: Int) {
         val item = items[position]
         h.name.text = item.name
         h.fav.isVisible = item.key in favorites()
+        h.num?.text = (if (item.num > 0) item.num else position + 1).toString()
+        h.rating?.let { r ->
+            r.isVisible = !item.rating.isNullOrBlank()
+            r.text = "★ ${item.rating}"
+        }
         Images.load(h.image, item.icon)
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
@@ -190,6 +206,7 @@ class ItemAdapter(
 }
 
 class EpisodeAdapter(
+    private val fallbackImage: () -> String? = { null },
     private val onClick: (Int) -> Unit
 ) : RecyclerView.Adapter<EpisodeAdapter.VH>() {
 
@@ -200,6 +217,8 @@ class EpisodeAdapter(
 
     class VH(v: View) : RecyclerView.ViewHolder(v) {
         val title: TextView = v.findViewById(R.id.tvTitle)
+        val sub: TextView = v.findViewById(R.id.tvSub)
+        val thumb: ImageView = v.findViewById(R.id.ivThumb)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -208,6 +227,10 @@ class EpisodeAdapter(
     override fun onBindViewHolder(h: VH, position: Int) {
         val e = episodes[position]
         h.title.text = episodeLabel(e)
+        val sub = listOfNotNull(e.duration?.takeIf { it.isNotBlank() }, e.plot?.takeIf { it.isNotBlank() }).joinToString("  •  ")
+        h.sub.text = sub
+        h.sub.isVisible = sub.isNotEmpty()
+        Images.load(h.thumb, e.icon ?: fallbackImage())
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) onClick(pos)

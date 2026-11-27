@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:background="@drawable/bg_item" android:clickable="true" android:focusable="true"
-    android:orientation="vertical" android:padding="6dp">
+    android:layout_margin="6dp"
+    android:background="@drawable/bg_poster" android:clickable="true" android:focusable="true"
+    android:orientation="vertical" android:padding="5dp">
     <FrameLayout
-        android:layout_width="match_parent" android:layout_height="180dp">
+        android:id="@+id/posterBox"
+        android:layout_width="match_parent" android:layout_height="190dp">
         <ImageView
             android:id="@+id/ivImage"
             android:layout_width="match_parent" android:layout_height="match_parent"
             android:scaleType="centerCrop" />
         <TextView
+            android:id="@+id/tvRating"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="top|start" android:layout_margin="5dp"
+            android:background="@drawable/bg_badge"
+            android:paddingStart="6dp" android:paddingTop="2dp" android:paddingEnd="6dp" android:paddingBottom="2dp"
+            android:textColor="#FFFFC531" android:textSize="12sp" android:textStyle="bold"
+            android:visibility="gone" />
+        <TextView
             android:id="@+id/tvFav"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_gravity="top|end" android:layout_margin="4dp"
-            android:text="★" android:textColor="@color/accent" android:textSize="22sp"
+            android:layout_gravity="top|end" android:layout_margin="5dp"
+            android:text="♥" android:textColor="#FFFF4D6D" android:textSize="20sp"
             android:shadowColor="#000000" android:shadowRadius="4"
             android:visibility="gone" />
     </FrameLayout>

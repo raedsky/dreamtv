@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
-        <shape><gradient android:angle="315" android:startColor="#FFFF7A18" android:endColor="#FFE5203A" />
-            <stroke android:width="4dp" android:color="#FFFFFFFF" /><corners android:radius="18dp" /></shape>
+        <shape><gradient android:angle="315" android:startColor="#FF00C6FF" android:endColor="#FF0052D4" />
+            <stroke android:width="4dp" android:color="#FFFFFFFF" /><corners android:radius="22dp" /></shape>
     </item>
     <item android:state_pressed="true">
-        <shape><gradient android:angle="315" android:startColor="#FFE5203A" android:endColor="#FFFF7A18" /><corners android:radius="18dp" /></shape>
+        <shape><gradient android:angle="315" android:startColor="#FF0052D4" android:endColor="#FF00C6FF" /><corners android:radius="22dp" /></shape>
     </item>
     <item>
-        <shape><gradient android:angle="315" android:startColor="#FFFF7A18" android:endColor="#FFE5203A" /><corners android:radius="18dp" /></shape>
+        <shape><gradient android:angle="315" android:startColor="#FF00C6FF" android:endColor="#FF0052D4" /><corners android:radius="22dp" /></shape>
     </item>
 </selector>

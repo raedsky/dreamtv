@@ -84,6 +84,13 @@ class BrowseActivity : AppCompatActivity() {
                 ContentType.SERIES -> R.string.series
             }
         )
+        findViewById<android.widget.ImageView>(R.id.ivSection).setImageResource(
+            when (type) {
+                ContentType.LIVE -> R.drawable.ic_live
+                ContentType.MOVIE -> R.drawable.ic_movie
+                ContentType.SERIES -> R.drawable.ic_series
+            }
+        )
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         rvCategories = findViewById(R.id.rvCategories)
         rvItems = findViewById(R.id.rvItems)
@@ -113,9 +120,9 @@ class BrowseActivity : AppCompatActivity() {
 
     private fun spanCount(): Int {
         val widthDp = resources.configuration.screenWidthDp
-        val paneDp = widthDp * 0.70f
+        val paneDp = widthDp * 0.72f
         if (type == ContentType.LIVE) return 1   // قائمة قنوات بجانب المعاينة
-        val cellDp = 140f
+        val cellDp = 150f
         return (paneDp / cellDp).toInt().coerceAtLeast(1)
     }
 
@@ -221,30 +228,9 @@ class BrowseActivity : AppCompatActivity() {
     // ---------------- الشريط العلوي ----------------
 
     private fun setupTopBar() {
-        val tabs = mapOf(
-            R.id.tabLive to ContentType.LIVE,
-            R.id.tabMovies to ContentType.MOVIE,
-            R.id.tabSeries to ContentType.SERIES
-        )
-        findViewById<View>(R.id.tabHome).setOnClickListener { finish() }
         findViewById<View>(R.id.btnRefresh).setOnClickListener {
             Toast.makeText(this, R.string.refreshing, Toast.LENGTH_SHORT).show()
             load(force = true)
-        }
-        for ((id, t) in tabs) {
-            val tab = findViewById<TextView>(id)
-            if (t == type) {
-                tab.isSelected = true
-                tab.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.accent))
-            }
-            tab.setOnClickListener {
-                if (t != type) {
-                    start(this, t)
-                    finish()
-                    @Suppress("DEPRECATION")
-                    overridePendingTransition(0, 0)
-                }
-            }
         }
     }
 
@@ -489,7 +475,7 @@ class BrowseActivity : AppCompatActivity() {
             stopPreview()
             Playback.play(this, playable.map { PlayQueue.Entry(it.name, it.url!!) }, start, live = true)
         } else {
-            Playback.play(this, listOf(PlayQueue.Entry(item.name, item.url ?: return)), 0, live = false)
+            MovieDetailActivity.open(this, item)
         }
     }
 
@@ -504,8 +490,8 @@ class BrowseActivity : AppCompatActivity() {
         previewCategory = findViewById(R.id.previewCategory)
 
         pane.isVisible = true
-        (findViewById<View>(R.id.itemsPane).layoutParams as LinearLayout.LayoutParams).weight = 3.5f
-        (pane.layoutParams as LinearLayout.LayoutParams).weight = 3.5f
+        (findViewById<View>(R.id.itemsPane).layoutParams as LinearLayout.LayoutParams).weight = 3.6f
+        (pane.layoutParams as LinearLayout.LayoutParams).weight = 3.8f
         pane.requestLayout()
         // مقاس 16:9
         box.post {
@@ -527,6 +513,75 @@ class BrowseActivity : AppCompatActivity() {
         previewHint.isVisible = false
         previewTitle.text = item.name
         previewCategory.text = content?.categories?.firstOrNull { it.id == item.categoryId }?.name.orEmpty()
+        loadEpg(item)
+    }
+
+    // ---------------- دليل البرامج ----------------
+
+    private var epgJob: kotlinx.coroutines.Job? = null
+
+    private fun loadEpg(item: StreamItem) {
+        val box = findViewById<LinearLayout>(R.id.epgList)
+        epgJob?.cancel()
+        box.removeAllViews()
+        epgJob = lifecycleScope.launch {
+            val list = app.repo.epg(item)
+            if (previewItem?.key != item.key) return@launch
+            box.removeAllViews()
+            if (list.isEmpty()) {
+                box.addView(TextView(this@BrowseActivity).apply {
+                    setText(R.string.no_epg)
+                    setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_secondary))
+                    textSize = 14f
+                })
+                return@launch
+            }
+            val tf = java.text.SimpleDateFormat(
+                if (android.text.format.DateFormat.is24HourFormat(this@BrowseActivity)) "HH:mm" else "hh:mm a",
+                java.util.Locale.getDefault())
+            val now = System.currentTimeMillis() / 1000
+            val pad = (8 * resources.displayMetrics.density).toInt()
+            for (e in list) {
+                val isNow = e.start <= now && now < e.end
+                val row = LinearLayout(this@BrowseActivity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(pad, pad, pad, pad)
+                    if (isNow) setBackgroundResource(R.drawable.bg_epg_now)
+                }
+                row.addView(TextView(this@BrowseActivity).apply {
+                    text = tf.format(java.util.Date(e.start * 1000)) + " - " + tf.format(java.util.Date(e.end * 1000)) +
+                        if (isNow) "   •  " + getString(R.string.now_playing) else ""
+                    setTextColor(androidx.core.content.ContextCompat.getColor(context,
+                        if (isNow) R.color.accent else R.color.text_secondary))
+                    textSize = 12f
+                })
+                row.addView(TextView(this@BrowseActivity).apply {
+                    text = e.title
+                    setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
+                    textSize = 15f
+                    maxLines = 2
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    if (isNow) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                })
+                if (isNow) {
+                    row.addView(ProgressBar(this@BrowseActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+                        max = 100
+                        progress = (((now - e.start) * 100) / (e.end - e.start).coerceAtLeast(1)).toInt()
+                        progressTintList = android.content.res.ColorStateList.valueOf(
+                            androidx.core.content.ContextCompat.getColor(context, R.color.accent))
+                    }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, pad / 2).apply { topMargin = pad / 2 })
+                    if (!e.desc.isNullOrBlank()) row.addView(TextView(this@BrowseActivity).apply {
+                        text = e.desc
+                        setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_secondary))
+                        textSize = 12f
+                        maxLines = 3
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                    })
+                }
+                box.addView(row, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = pad / 2 })
+            }
+        }
     }
 
     private fun stopPreview() {

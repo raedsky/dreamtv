@@ -40,12 +40,13 @@ class HomeActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.btnSettings).setOnClickListener { showSettings() }
         findViewById<View>(R.id.btnExit).setOnClickListener { finishAffinity() }
+        findViewById<View>(R.id.btnAccount).setOnClickListener { showAccount() }
 
         // تكبير بسيط للعنصر المحدد بالريموت
         for (id in intArrayOf(R.id.tileLive, R.id.tileMovies, R.id.tileSeries,
-                R.id.btnPlaylists, R.id.btnReload, R.id.btnSettings, R.id.btnExit)) {
+                R.id.btnPlaylists, R.id.btnAccount, R.id.btnReload, R.id.btnSettings, R.id.btnExit)) {
             findViewById<View>(id).setOnFocusChangeListener { v, has ->
-                val s = if (has) 1.05f else 1f
+                val s = if (has) (if (v.id == R.id.tileLive || v.id == R.id.tileMovies || v.id == R.id.tileSeries) 1.06f else 1.15f) else 1f
                 v.animate().scaleX(s).scaleY(s).setDuration(120).start()
             }
         }
@@ -118,13 +119,14 @@ class HomeActivity : AppCompatActivity() {
         val p = app.prefs.profile
         val tvAccount = findViewById<TextView>(R.id.tvAccount)
         val tvExpiry = findViewById<TextView>(R.id.tvExpiry)
+        findViewById<TextView>(R.id.tvMac).text = deviceLine().trim()
         if (p == null) {
-            tvAccount.text = getString(R.string.no_playlist) + deviceLine()
+            tvAccount.text = getString(R.string.no_playlist)
             tvExpiry.text = getString(R.string.expiry, "—")
             return
         }
         val user = if (p.kind == Profile.XTREAM) "  •  ${p.username}" else ""
-        tvAccount.text = getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) }) + user + deviceLine()
+        tvAccount.text = getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) }) + user
         tvExpiry.text = if (p.kind == Profile.XTREAM) {
             val exp = p.expiry
             val text = if (exp != null) DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))
@@ -140,7 +142,34 @@ class HomeActivity : AppCompatActivity() {
         val exp = panelDevice?.expires_at
         val until = if (exp != null) "  •  " + getString(R.string.device_until,
             DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(exp * 1000))) else ""
-        return "\nMAC: $mac$until"
+        return "MAC: $mac$until"
+    }
+
+    /** معلومات الحساب والجهاز */
+    private fun showAccount() {
+        val p = app.prefs.profile
+        val df = DateFormat.getDateInstance(DateFormat.MEDIUM)
+        val lines = mutableListOf<String>()
+        if (PanelConfig.enabled) {
+            lines += "MAC: " + Panel.deviceIds(this).first
+            panelDevice?.expires_at?.let { lines += getString(R.string.device_until, df.format(Date(it * 1000))) }
+            lines += ""
+        }
+        if (p == null) lines += getString(R.string.no_playlist)
+        else {
+            lines += getString(R.string.active_playlist, p.name.ifBlank { Prefs.defaultName(p) })
+            if (p.kind == Profile.XTREAM) {
+                lines += getString(R.string.username) + ": " + p.username
+                lines += getString(R.string.expiry, p.expiry?.let { df.format(Date(it * 1000)) } ?: getString(R.string.unlimited))
+            }
+        }
+        lines += ""
+        lines += "v" + runCatching { packageManager.getPackageInfo(packageName, 0).versionName }.getOrNull().orEmpty()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.account_info)
+            .setMessage(lines.joinToString("\n"))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun loadWeather() {

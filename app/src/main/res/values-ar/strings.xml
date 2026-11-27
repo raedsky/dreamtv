@@ -107,4 +107,13 @@
     <string name="other_server">سيرفر آخر (اكتب الرابط)…</string>
     <string name="server_label">السيرفر</string>
     <string name="refreshing">جارٍ التحديث…</string>
+    <string name="account_info">الحساب</string>
+    <string name="categories">التصنيفات</string>
+    <string name="tv_guide">دليل البرامج</string>
+    <string name="no_epg">لا يوجد دليل برامج لهذه القناة</string>
+    <string name="now_playing">الآن</string>
+    <string name="play">تشغيل</string>
+    <string name="trailer">الإعلان</string>
+    <string name="director">المخرج: %1$s</string>
+    <string name="cast">الممثلون: %1$s</string>
 </resources>

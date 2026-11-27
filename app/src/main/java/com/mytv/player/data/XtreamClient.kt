@@ -79,27 +79,87 @@ class XtreamClient(
                 ContentType.LIVE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null
                     StreamItem("L:$id", id, name, o.str("stream_icon"), cat, type,
-                        "$base/live/$user/$pass/$id.$liveExt", o.str("added")?.toLongOrNull() ?: 0)
+                        "$base/live/$user/$pass/$id.$liveExt", o.str("added")?.toLongOrNull() ?: 0,
+                        num = o.str("num")?.toIntOrNull() ?: 0)
                 }
                 ContentType.MOVIE -> {
                     val id = o.str("stream_id") ?: return@mapNotNull null
                     val ext = o.str("container_extension")?.takeIf { it.isNotBlank() } ?: "mp4"
                     StreamItem("M:$id", id, name, o.str("stream_icon"), cat, type,
-                        "$base/movie/$user/$pass/$id.$ext", o.str("added")?.toLongOrNull() ?: 0)
+                        "$base/movie/$user/$pass/$id.$ext", o.str("added")?.toLongOrNull() ?: 0,
+                        rating = rating(o))
                 }
                 ContentType.SERIES -> {
                     val id = o.str("series_id") ?: return@mapNotNull null
                     StreamItem("S:$id", id, name, o.str("cover"), cat, type, null,
-                        o.str("last_modified")?.toLongOrNull() ?: 0)
+                        o.str("last_modified")?.toLongOrNull() ?: 0, rating = rating(o))
                 }
             }
         }
     }
 
-    fun seriesEpisodes(seriesId: String): List<Episode> {
+    private fun rating(o: JsonObject): String? {
+        val r = o.str("rating")?.toDoubleOrNull()?.takeIf { it > 0 }
+            ?: o.str("rating_5based")?.toDoubleOrNull()?.takeIf { it > 0 }?.times(2)
+            ?: return null
+        return String.format(java.util.Locale.US, "%.1f", r.coerceAtMost(10.0))
+    }
+
+    private fun JsonObject.obj(name: String): JsonObject? = get(name)?.takeIf { it.isJsonObject }?.asJsonObject
+
+    /** أول نص غير فارغ من حقل قد يكون نصاً أو مصفوفة */
+    private fun JsonObject.first(name: String): String? {
+        val e = get(name) ?: return null
+        if (e.isJsonArray) return e.asJsonArray.firstOrNull { it.isJsonPrimitive && it.asString.isNotBlank() }?.asString
+        return str(name)?.takeIf { it.isNotBlank() && it != "null" }
+    }
+
+    private fun mediaInfo(info: JsonObject?): MediaInfo? {
+        info ?: return null
+        fun t(vararg keys: String) = keys.firstNotNullOfOrNull { info.first(it) }?.trim()?.takeIf { it.isNotEmpty() }
+        val r = t("rating")?.toDoubleOrNull()?.takeIf { it > 0 }
+        return MediaInfo(
+            plot = t("plot", "description"),
+            genre = t("genre"),
+            cast = t("cast", "actors"),
+            director = t("director"),
+            release = t("releasedate", "releaseDate", "release_date"),
+            duration = t("duration"),
+            rating = r?.let { String.format(java.util.Locale.US, "%.1f", it.coerceAtMost(10.0)) },
+            backdrop = t("backdrop_path"),
+            cover = t("movie_image", "cover", "cover_big"),
+            trailer = t("youtube_trailer")
+        )
+    }
+
+    fun vodInfo(vodId: String): MediaInfo? {
+        val root = request("get_vod_info", "&vod_id=" + enc(vodId))
+        return mediaInfo(root.takeIf { it.isJsonObject }?.asJsonObject?.obj("info"))
+    }
+
+    /** دليل البرامج القصير للقناة (الحالي والقادم). */
+    fun shortEpg(streamId: String, limit: Int = 6): List<EpgEntry> {
+        val root = request("get_short_epg", "&stream_id=" + enc(streamId) + "&limit=$limit")
+        val arr = root.takeIf { it.isJsonObject }?.asJsonObject?.get("epg_listings")
+            ?.takeIf { it.isJsonArray }?.asJsonArray ?: return emptyList()
+        fun b64(s: String?): String? = s?.let {
+            runCatching { String(android.util.Base64.decode(it, android.util.Base64.DEFAULT), Charsets.UTF_8) }.getOrDefault(it)
+        }?.trim()
+        return arr.mapNotNull { e ->
+            val o = e.takeIf { it.isJsonObject }?.asJsonObject ?: return@mapNotNull null
+            val start = o.str("start_timestamp")?.toLongOrNull() ?: return@mapNotNull null
+            val end = o.str("stop_timestamp")?.toLongOrNull() ?: return@mapNotNull null
+            EpgEntry(b64(o.str("title")) ?: "", start, end, b64(o.str("description")))
+        }.filter { it.end > System.currentTimeMillis() / 1000 }
+    }
+
+    fun seriesEpisodes(seriesId: String): List<Episode> = seriesDetails(seriesId).second
+
+    fun seriesDetails(seriesId: String): Pair<MediaInfo?, List<Episode>> {
         val root = request("get_series_info", "&series_id=" + enc(seriesId))
-        if (!root.isJsonObject) return emptyList()
-        val eps = root.asJsonObject.get("episodes") ?: return emptyList()
+        if (!root.isJsonObject) return null to emptyList()
+        val info = mediaInfo(root.asJsonObject.obj("info"))
+        val eps = root.asJsonObject.get("episodes") ?: return info to emptyList()
         // بعض السيرفرات ترجع المواسم ككائن {"1":[...]} وبعضها كمصفوفة [[...]]
         val seasons: List<JsonElement> = when {
             eps.isJsonObject -> eps.asJsonObject.entrySet().map { it.value }
@@ -116,18 +176,20 @@ class XtreamClient(
                 val ext = o.str("container_extension")?.takeIf { it.isNotBlank() } ?: "mp4"
                 val season = o.str("season")?.toIntOrNull() ?: 0
                 val num = o.str("episode_num")?.toIntOrNull() ?: 0
-                val img = o.get("info")?.takeIf { it.isJsonObject }?.asJsonObject?.str("movie_image")
+                val ei = o.obj("info")
                 out += Episode(
                     id = id,
                     title = o.str("title") ?: "Episode $num",
                     season = season,
                     number = num,
                     url = "$base/series/$user/$pass/$id.$ext",
-                    icon = img
+                    icon = ei?.first("movie_image"),
+                    duration = ei?.first("duration"),
+                    plot = ei?.first("plot")
                 )
             }
         }
-        return out.sortedWith(compareBy({ it.season }, { it.number }))
+        return info to out.sortedWith(compareBy({ it.season }, { it.number }))
     }
 
     companion object {

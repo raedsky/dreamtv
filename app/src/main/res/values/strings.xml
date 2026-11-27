@@ -107,4 +107,13 @@
     <string name="other_server">Other server (enter URL)…</string>
     <string name="server_label">Server</string>
     <string name="refreshing">Refreshing…</string>
+    <string name="account_info">Account</string>
+    <string name="categories">Categories</string>
+    <string name="tv_guide">TV Guide</string>
+    <string name="no_epg">No program guide for this channel</string>
+    <string name="now_playing">Now</string>
+    <string name="play">Play</string>
+    <string name="trailer">Trailer</string>
+    <string name="director">Director: %1$s</string>
+    <string name="cast">Cast: %1$s</string>
 </resources>

@@ -20,8 +20,29 @@ data class StreamItem(
     val type: ContentType,
     val url: String?,
     /** وقت الإضافة (ثواني Unix) للترتيب حسب الأحدث — 0 إذا غير معروف */
-    val added: Long = 0
+    val added: Long = 0,
+    /** التقييم من 10 (أفلام/مسلسلات) إن وُجد */
+    val rating: String? = null,
+    /** رقم القناة في السيرفر */
+    val num: Int = 0
 )
+
+/** تفاصيل فيلم أو مسلسل (من get_vod_info / get_series_info). */
+data class MediaInfo(
+    val plot: String? = null,
+    val genre: String? = null,
+    val cast: String? = null,
+    val director: String? = null,
+    val release: String? = null,
+    val duration: String? = null,
+    val rating: String? = null,
+    val backdrop: String? = null,
+    val cover: String? = null,
+    val trailer: String? = null
+)
+
+/** برنامج في دليل القنوات. الأوقات بثواني Unix. */
+data class EpgEntry(val title: String, val start: Long, val end: Long, val desc: String? = null)
 
 data class Episode(
     val id: String,
@@ -29,7 +50,9 @@ data class Episode(
     val season: Int,
     val number: Int,
     val url: String,
-    val icon: String?
+    val icon: String?,
+    val duration: String? = null,
+    val plot: String? = null
 )
 
 /** قروب خاص ينشئه المستخدم. [items] قائمة مفاتيح StreamItem.key بالترتيب. */
