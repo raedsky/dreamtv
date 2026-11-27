@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="h_pad_top">6dp</dimen>
+    <dimen name="h_logo_w">64dp</dimen>
+    <dimen name="h_logo_h">44dp</dimen>
+    <dimen name="h_pill_h">46dp</dimen>
+    <dimen name="h_pill_gap">20dp</dimen>
+    <dimen name="h_clock">24sp</dimen>
+    <dimen name="h_temp">20sp</dimen>
+    <dimen name="h_live_icon">56dp</dimen>
+    <dimen name="h_live_title_h">30dp</dimen>
+    <dimen name="h_live_gap">8dp</dimen>
+    <dimen name="h_live_sub_h">20dp</dimen>
+    <dimen name="h_mid_icon">40dp</dimen>
+    <dimen name="h_mid_title_h">26dp</dimen>
+    <dimen name="h_mid_sub_h">18dp</dimen>
+    <dimen name="h_row_gap">10dp</dimen>
+    <dimen name="h_small_icon">24dp</dimen>
+    <dimen name="h_small_text_h">28dp</dimen>
+    <dimen name="h_small_gap">4dp</dimen>
+    <dimen name="h_cards_margin">16dp</dimen>
+    <dimen name="h_card_pad">8dp</dimen>
+</resources>

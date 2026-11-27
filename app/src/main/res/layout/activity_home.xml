@@ -9,19 +9,19 @@
     <LinearLayout
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingStart="40dp" android:paddingTop="18dp" android:paddingEnd="40dp" android:paddingBottom="10dp">
+        android:paddingStart="40dp" android:paddingTop="@dimen/h_pad_top" android:paddingEnd="40dp" android:paddingBottom="10dp">
 
         <!-- الشريط العلوي -->
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:gravity="center_vertical" android:orientation="horizontal">
             <ImageView
-                android:layout_width="96dp" android:layout_height="72dp"
+                android:layout_width="@dimen/h_logo_w" android:layout_height="@dimen/h_logo_h"
                 android:scaleType="fitCenter" android:src="@drawable/ic_launcher" />
 
             <LinearLayout
-                android:layout_width="wrap_content" android:layout_height="64dp"
-                android:layout_marginStart="40dp"
+                android:layout_width="wrap_content" android:layout_height="@dimen/h_pill_h"
+                android:layout_marginStart="@dimen/h_pill_gap"
                 android:tag="glass"
                 android:gravity="center_vertical" android:orientation="horizontal"
                 android:paddingStart="22dp" android:paddingEnd="24dp">
@@ -59,7 +59,7 @@
                     android:id="@+id/tvTemp"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
-                    android:textColor="@color/text_primary" android:textSize="26sp" android:textStyle="bold" />
+                    android:textColor="@color/text_primary" android:textSize="@dimen/h_temp" android:textStyle="bold" />
             </LinearLayout>
 
             <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
@@ -73,7 +73,7 @@
                     <TextClock
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:format12Hour="hh:mm" android:format24Hour="HH:mm"
-                        android:textColor="@color/text_primary" android:textSize="36sp" android:textStyle="bold" />
+                        android:textColor="@color/text_primary" android:textSize="@dimen/h_clock" android:textStyle="bold" />
                     <TextClock
                         android:id="@+id/tvAmPm"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
         <!-- البطاقات -->
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4.3"
-            android:layout_marginStart="24dp" android:layout_marginEnd="24dp"
+            android:layout_marginStart="@dimen/h_cards_margin" android:layout_marginEnd="@dimen/h_cards_margin"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -101,17 +101,17 @@
                 android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                 android:tag="card"
                 android:clickable="true" android:focusable="true"
-                android:gravity="center" android:orientation="vertical" android:padding="16dp">
+                android:gravity="center" android:orientation="vertical" android:padding="@dimen/h_card_pad">
                 <com.mytv.player.ui.GradientImageView
-                    android:layout_width="110dp" android:layout_height="110dp"
+                    android:layout_width="@dimen/h_live_icon" android:layout_height="@dimen/h_live_icon"
                     android:src="@drawable/ic_live" />
                 <TextView
-                    android:layout_width="match_parent" android:gravity="center" android:layout_height="40dp"
-                    android:layout_marginTop="22dp"
+                    android:layout_width="match_parent" android:gravity="center" android:layout_height="@dimen/h_live_title_h"
+                    android:layout_marginTop="@dimen/h_live_gap"
                     android:text="@string/live"
                     android:textColor="@color/text_primary" android:textSize="28sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="28sp" />
                 <TextView
-                    android:layout_width="match_parent" android:gravity="center" android:layout_height="24dp"
+                    android:layout_width="match_parent" android:gravity="center" android:layout_height="@dimen/h_live_sub_h"
                     android:layout_marginTop="6dp"
                     android:text="@string/live_sub"
                     android:textColor="@color/text_secondary" android:textSize="15sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="15sp" />
@@ -130,19 +130,19 @@
                         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
                         android:tag="card"
                         android:clickable="true" android:focusable="true"
-                        android:gravity="center" android:orientation="horizontal" android:padding="16dp">
+                        android:gravity="center" android:orientation="horizontal" android:padding="@dimen/h_card_pad">
                         <com.mytv.player.ui.GradientImageView
-                            android:layout_width="58dp" android:layout_height="58dp"
+                            android:layout_width="@dimen/h_mid_icon" android:layout_height="@dimen/h_mid_icon"
                             android:src="@drawable/ic_movie" />
                         <LinearLayout
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                             android:layout_marginStart="14dp" android:orientation="vertical">
                             <TextView
-                                android:layout_width="match_parent" android:layout_height="32dp"
+                                android:layout_width="match_parent" android:layout_height="@dimen/h_mid_title_h"
                                 android:text="@string/movies"
                                 android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="22sp" />
                             <TextView
-                                android:layout_width="match_parent" android:layout_height="22dp"
+                                android:layout_width="match_parent" android:layout_height="@dimen/h_mid_sub_h"
                                 android:layout_marginTop="4dp"
                                 android:text="@string/movies_sub"
                                 android:textColor="@color/text_secondary" android:textSize="14sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="14sp" />
@@ -154,19 +154,19 @@
                         android:layout_marginStart="20dp"
                         android:tag="card"
                         android:clickable="true" android:focusable="true"
-                        android:gravity="center" android:orientation="horizontal" android:padding="16dp">
+                        android:gravity="center" android:orientation="horizontal" android:padding="@dimen/h_card_pad">
                         <com.mytv.player.ui.GradientImageView
-                            android:layout_width="58dp" android:layout_height="58dp"
+                            android:layout_width="@dimen/h_mid_icon" android:layout_height="@dimen/h_mid_icon"
                             android:src="@drawable/ic_series" />
                         <LinearLayout
                             android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                             android:layout_marginStart="14dp" android:orientation="vertical">
                             <TextView
-                                android:layout_width="match_parent" android:layout_height="32dp"
+                                android:layout_width="match_parent" android:layout_height="@dimen/h_mid_title_h"
                                 android:text="@string/series"
                                 android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="22sp" />
                             <TextView
-                                android:layout_width="match_parent" android:layout_height="22dp"
+                                android:layout_width="match_parent" android:layout_height="@dimen/h_mid_sub_h"
                                 android:layout_marginTop="4dp"
                                 android:text="@string/series_sub"
                                 android:textColor="@color/text_secondary" android:textSize="14sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="14sp" />
@@ -176,7 +176,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-                    android:layout_marginTop="22dp"
+                    android:layout_marginTop="@dimen/h_row_gap"
                     android:orientation="horizontal">
                     <LinearLayout android:id="@+id/btnSettings" style="@style/DreamSmall">
                         <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_settings" />

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.MyTV" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
         <item name="colorPrimary">@color/accent</item>
         <item name="colorPrimaryVariant">@color/accent</item>
         <item name="colorOnPrimary">#000000</item>
@@ -263,16 +264,16 @@
         <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:padding">4dp</item>
     </style>
     <style name="DreamSmallIcon">
-        <item name="android:layout_width">36dp</item>
-        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_width">@dimen/h_small_icon</item>
+        <item name="android:layout_height">@dimen/h_small_icon</item>
     </style>
     <style name="DreamSmallText">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">36dp</item>
-        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:layout_height">@dimen/h_small_text_h</item>
+        <item name="android:layout_marginTop">@dimen/h_small_gap</item>
         <item name="android:gravity">center</item>
         <item name="android:maxLines">2</item>
         <item name="android:textColor">#FFFFFFFF</item>
