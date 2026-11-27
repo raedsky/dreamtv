@@ -1,0 +1,74 @@
+name: APK Builder
+run-name: "Build ${{ inputs.build_id }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: "Build number from the panel"
+        required: true
+      config:
+        description: "Base64 JSON config from the panel"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-builder
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check build id
+        env:
+          BUILD_ID: ${{ inputs.build_id }}
+        run: |
+          [[ "$BUILD_ID" =~ ^[0-9]{1,9}$ ]] || { echo "bad build id"; exit 1; }
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Apply panel config
+        env:
+          CONFIG_B64: ${{ inputs.config }}
+        run: |
+          pip install --quiet pillow
+          python3 tools/apply_config.py
+
+      - name: Signing key (optional)
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_ID: ${{ inputs.build_id }}
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" "app-build-$BUILD_ID.apk"
+          gh release delete "build-$BUILD_ID" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "build-$BUILD_ID" "app-build-$BUILD_ID.apk" \
+            --title "Build $BUILD_ID" --notes "Built from the panel APK Builder" --latest=false
