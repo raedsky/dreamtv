@@ -253,7 +253,7 @@
     </style>
 
     <!-- أزرار الشاشة الرئيسية الصغيرة -->
-    <style name="HomeSmall">
+    <style name="DreamSmall">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
@@ -265,11 +265,11 @@
         <item name="android:orientation">vertical</item>
         <item name="android:padding">8dp</item>
     </style>
-    <style name="HomeSmallIcon">
+    <style name="DreamSmallIcon">
         <item name="android:layout_width">46dp</item>
         <item name="android:layout_height">46dp</item>
     </style>
-    <style name="HomeSmallText">
+    <style name="DreamSmallText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">10dp</item>

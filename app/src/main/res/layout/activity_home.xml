@@ -177,25 +177,25 @@
                     android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
                     android:layout_marginTop="22dp"
                     android:orientation="horizontal">
-                    <LinearLayout android:id="@+id/btnSettings" style="@style/HomeSmall">
-                        <com.mytv.player.ui.GradientImageView style="@style/HomeSmallIcon" android:src="@drawable/ic_settings" />
-                        <TextView style="@style/HomeSmallText" android:text="@string/settings" />
+                    <LinearLayout android:id="@+id/btnSettings" style="@style/DreamSmall">
+                        <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_settings" />
+                        <TextView style="@style/DreamSmallText" android:text="@string/settings" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btnPlaylists" style="@style/HomeSmall">
-                        <com.mytv.player.ui.GradientImageView style="@style/HomeSmallIcon" android:src="@drawable/ic_playlists" />
-                        <TextView style="@style/HomeSmallText" android:text="@string/change_playlist" />
+                    <LinearLayout android:id="@+id/btnPlaylists" style="@style/DreamSmall">
+                        <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_playlists" />
+                        <TextView style="@style/DreamSmallText" android:text="@string/change_playlist" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btnReload" style="@style/HomeSmall">
-                        <com.mytv.player.ui.GradientImageView style="@style/HomeSmallIcon" android:src="@drawable/ic_reload" />
-                        <TextView style="@style/HomeSmallText" android:text="@string/reload" />
+                    <LinearLayout android:id="@+id/btnReload" style="@style/DreamSmall">
+                        <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_reload" />
+                        <TextView style="@style/DreamSmallText" android:text="@string/reload" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btnAccount" style="@style/HomeSmall">
-                        <com.mytv.player.ui.GradientImageView style="@style/HomeSmallIcon" android:src="@drawable/ic_account" />
-                        <TextView style="@style/HomeSmallText" android:text="@string/account_info" />
+                    <LinearLayout android:id="@+id/btnAccount" style="@style/DreamSmall">
+                        <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_account" />
+                        <TextView style="@style/DreamSmallText" android:text="@string/account_info" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btnExit" style="@style/HomeSmall">
-                        <com.mytv.player.ui.GradientImageView style="@style/HomeSmallIcon" android:src="@drawable/ic_exit" />
-                        <TextView style="@style/HomeSmallText" android:text="@string/exit" />
+                    <LinearLayout android:id="@+id/btnExit" style="@style/DreamSmall">
+                        <com.mytv.player.ui.GradientImageView style="@style/DreamSmallIcon" android:src="@drawable/ic_exit" />
+                        <TextView style="@style/DreamSmallText" android:text="@string/exit" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
