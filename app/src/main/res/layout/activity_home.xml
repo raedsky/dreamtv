@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <com.mytv.player.ui.StreaksView
@@ -92,7 +93,7 @@
         <!-- البطاقات -->
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="4.3"
-            android:layout_marginStart="120dp" android:layout_marginEnd="120dp"
+            android:layout_marginStart="24dp" android:layout_marginEnd="24dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -102,18 +103,18 @@
                 android:clickable="true" android:focusable="true"
                 android:gravity="center" android:orientation="vertical" android:padding="16dp">
                 <com.mytv.player.ui.GradientImageView
-                    android:layout_width="140dp" android:layout_height="140dp"
+                    android:layout_width="110dp" android:layout_height="110dp"
                     android:src="@drawable/ic_live" />
                 <TextView
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:gravity="center" android:layout_height="40dp"
                     android:layout_marginTop="22dp"
                     android:text="@string/live"
-                    android:textColor="@color/text_primary" android:textSize="30sp" android:textStyle="bold" />
+                    android:textColor="@color/text_primary" android:textSize="28sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="28sp" />
                 <TextView
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:gravity="center" android:layout_height="24dp"
                     android:layout_marginTop="6dp"
                     android:text="@string/live_sub"
-                    android:textColor="@color/text_secondary" android:textSize="16sp" />
+                    android:textColor="@color/text_secondary" android:textSize="15sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -131,20 +132,20 @@
                         android:clickable="true" android:focusable="true"
                         android:gravity="center" android:orientation="horizontal" android:padding="16dp">
                         <com.mytv.player.ui.GradientImageView
-                            android:layout_width="84dp" android:layout_height="84dp"
+                            android:layout_width="58dp" android:layout_height="58dp"
                             android:src="@drawable/ic_movie" />
                         <LinearLayout
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:layout_marginStart="18dp" android:orientation="vertical">
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:layout_marginStart="14dp" android:orientation="vertical">
                             <TextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="match_parent" android:layout_height="32dp"
                                 android:text="@string/movies"
-                                android:textColor="@color/text_primary" android:textSize="26sp" android:textStyle="bold" />
+                                android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="22sp" />
                             <TextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="match_parent" android:layout_height="22dp"
                                 android:layout_marginTop="4dp"
                                 android:text="@string/movies_sub"
-                                android:textColor="@color/text_secondary" android:textSize="15sp" />
+                                android:textColor="@color/text_secondary" android:textSize="14sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -155,20 +156,20 @@
                         android:clickable="true" android:focusable="true"
                         android:gravity="center" android:orientation="horizontal" android:padding="16dp">
                         <com.mytv.player.ui.GradientImageView
-                            android:layout_width="84dp" android:layout_height="84dp"
+                            android:layout_width="58dp" android:layout_height="58dp"
                             android:src="@drawable/ic_series" />
                         <LinearLayout
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:layout_marginStart="18dp" android:orientation="vertical">
+                            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:layout_marginStart="14dp" android:orientation="vertical">
                             <TextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="match_parent" android:layout_height="32dp"
                                 android:text="@string/series"
-                                android:textColor="@color/text_primary" android:textSize="26sp" android:textStyle="bold" />
+                                android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="22sp" />
                             <TextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="match_parent" android:layout_height="22dp"
                                 android:layout_marginTop="4dp"
                                 android:text="@string/series_sub"
-                                android:textColor="@color/text_secondary" android:textSize="15sp" />
+                                android:textColor="@color/text_secondary" android:textSize="14sp"  android:maxLines="1" app:autoSizeTextType="uniform" app:autoSizeMinTextSize="10sp" app:autoSizeStepGranularity="1sp" app:autoSizeMaxTextSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
