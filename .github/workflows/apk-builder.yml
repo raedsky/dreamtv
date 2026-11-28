@@ -55,8 +55,8 @@ jobs:
 
       - name: Build APK
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'mytvsign' }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'mytv' }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
