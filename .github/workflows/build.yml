@@ -46,6 +46,16 @@ jobs:
             echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
           fi
 
+      - name: Version from build number
+        if: steps.src.outputs.ok == 'true'
+        run: |
+          # كل بناء رقم إصدار أكبر من اللي قبله ⇒ التحديث من داخل التطبيق يشتغل
+          V=$((GITHUB_RUN_NUMBER + 100))
+          sed -i "s/versionCode = [0-9]*/versionCode = $V/; s/versionName = \"[^\"]*\"/versionName = \"2.$GITHUB_RUN_NUMBER\"/" app/build.gradle.kts
+          echo "APP_VCODE=$V" >> "$GITHUB_ENV"
+          echo "APP_VNAME=2.$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          grep -n "versionCode\|versionName" app/build.gradle.kts
+
       - name: Build APK
         if: steps.src.outputs.ok == 'true'
         env:
@@ -70,6 +80,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp "$(ls app/build/outputs/apk/release/*.apk | head -1)" MyTV.apk
+          REPO_URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/MyTV.apk"
+          printf '{"code":%s,"name":"%s","url":"%s"}' "$APP_VCODE" "$APP_VNAME" "$REPO_URL" > version.json
+          cat version.json
           gh release delete app-latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create app-latest MyTV.apk --title "MyTV (latest)" \
+          gh release create app-latest MyTV.apk version.json --title "MyTV (latest)" \
             --notes "Latest build from ${GITHUB_SHA::7}" --latest
