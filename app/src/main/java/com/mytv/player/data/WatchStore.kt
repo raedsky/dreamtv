@@ -40,7 +40,7 @@ class WatchStore(context: Context) {
             e.putString("p_$key", "$position,$duration")
         }
         if (seriesKey != null) e.putString("last_$seriesKey", key)
-        e.apply()
+        e.commit()
     }
 
     /** مفتاح آخر حلقة شوهدت في المسلسل */

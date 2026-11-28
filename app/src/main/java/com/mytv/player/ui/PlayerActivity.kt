@@ -182,6 +182,11 @@ class PlayerActivity : BaseActivity() {
         if (::playerView.isInitialized) initPlayer()
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveProgress()
+    }
+
     override fun onStop() {
         super.onStop()
         com.mytv.player.data.Panel.NowPlaying.clear(this)
@@ -205,6 +210,7 @@ class PlayerActivity : BaseActivity() {
         val key = e.key ?: return
         if (PlayQueue.live) return
         val p = player ?: return
+        if (pendingSeek >= 0 || p.playbackState == Player.STATE_IDLE) return
         val dur = p.duration.takeIf { it > 0 } ?: 0L
         App.instance.watch.save(key, p.currentPosition, dur, e.seriesKey)
     }
@@ -224,17 +230,29 @@ class PlayerActivity : BaseActivity() {
                 getString(R.string.resume_from, com.mytv.player.data.WatchStore.format(pos)),
                 getString(R.string.start_over)
             )) { _, which ->
-                if (which == 0) p.seekTo(pos)
+                if (which == 0) seekWhenReady(p, pos)
                 p.playWhenReady = true
             }
-            .setOnCancelListener { p.seekTo(pos); p.playWhenReady = true }
+            .setOnCancelListener { seekWhenReady(p, pos); p.playWhenReady = true }
             .show()
+    }
+
+    /** مكان الاستئناف المعلّق حتى يجهز البث */
+    private var pendingSeek: Long = -1
+
+    private fun seekWhenReady(p: ExoPlayer, pos: Long) {
+        if (p.playbackState == Player.STATE_READY) p.seekTo(pos) else pendingSeek = pos
     }
 
     private fun initPlayer() {
         val p = Players.create(this)
         p.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY && pendingSeek >= 0) {
+                    val pos = pendingSeek
+                    pendingSeek = -1
+                    p.seekTo(pos)
+                }
                 // نهاية الحلقة: نحفظها كمشاهدة وننتقل للحلقة التالية تلقائياً
                 if (state == Player.STATE_ENDED && !PlayQueue.live) {
                     saveProgress()
@@ -298,6 +316,7 @@ class PlayerActivity : BaseActivity() {
     private fun playCurrent() {
         val e = PlayQueue.current ?: return
         val p = player ?: return
+        pendingSeek = -1
         p.setMediaItem(Players.mediaItem(e.url))
         p.prepare()
         p.playWhenReady = true
