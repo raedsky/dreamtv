@@ -143,8 +143,7 @@
     <string name="live_format_title">تنسيق البث المباشر</string>
     <string name="players">المشغلات</string>
     <string name="sd_only_title">جودة SD فقط</string>
-    <string name="update_now">تحديث الآن</string>
-    <string name="mac_address">عنوان ماك: %1$s</string>
+        <string name="mac_address">عنوان ماك: %1$s</string>
     <string name="tab_home_full">الصفحة الرئيسية</string>
     <string name="fullscreen">ملء الشاشة</string>
     <string name="search_btn">بحث</string>
@@ -163,4 +162,18 @@
     <string name="stopped_at">توقفت عند %1$s</string>
     <string name="stopped_at_of">توقفت عند %1$s من %2$s</string>
     <string name="watched">تمت المشاهدة</string>
+    <string name="update_app">تحديث التطبيق</string>
+    <string name="version_x">الإصدار %1$s</string>
+    <string name="update_checking">جاري البحث عن تحديث…</string>
+    <string name="update_unavailable">تعذر فحص التحديث حالياً</string>
+    <string name="update_latest">عندك أحدث إصدار (%1$s)</string>
+    <string name="update_available">يوجد تحديث جديد</string>
+    <string name="update_available_msg">الإصدار %1$s متوفر (عندك %2$s). تحدّث الآن؟</string>
+    <string name="update_now_btn">تحديث الآن</string>
+    <string name="later">لاحقاً</string>
+    <string name="update_downloading">جاري تحميل التحديث… %1$d%%</string>
+    <string name="update_failed">فشل التحديث: %1$s</string>
+    <string name="update_allow_install">لتثبيت التحديثات، اسمح للتطبيق بتثبيت التطبيقات مرة وحدة. فعّلها في الشاشة التالية ثم ارجع واضغط تحديث مرة ثانية.</string>
+    <string name="open_settings">فتح الإعدادات</string>
+    <string name="update_now">تحديث المحتوى</string>
 </resources>

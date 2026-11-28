@@ -25,8 +25,12 @@ data class PanelState(
     val dns: List<PanelDns>?,
     val playlists: List<PanelPlaylist>?,
     val message: PanelMessage?,
-    val theme: String? = null
+    val theme: String? = null,
+    val update: PanelUpdate? = null
 )
+
+/** آخر نسخة متاحة من التطبيق */
+data class PanelUpdate(val code: Int, val name: String?, val url: String?)
 
 /** الاتصال بلوحة التحكم (api.php). */
 object Panel {

@@ -98,7 +98,9 @@ class SettingsActivity : BaseActivity() {
                 p.sdOnly = !p.sdOnly
                 refresh()
             },
-            Option(R.drawable.ic_download, getString(R.string.update_now)) {
+            Option(R.drawable.ic_download, getString(R.string.update_app),
+                { getString(R.string.version_x, Updater.currentName(this)) }) { checkUpdate() },
+            Option(R.drawable.ic_reload, getString(R.string.update_now)) {
                 app.repo.clear()
                 Toast.makeText(this, R.string.data_cleared, Toast.LENGTH_SHORT).show()
             }
@@ -167,6 +169,20 @@ class SettingsActivity : BaseActivity() {
                 finish()
             }
             .show()
+    }
+
+    /** فحص وجود نسخة أحدث من التطبيق */
+    private fun checkUpdate() {
+        Toast.makeText(this, R.string.update_checking, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val u = Updater.latest(this@SettingsActivity, refresh = true)
+            when {
+                u == null -> Toast.makeText(this@SettingsActivity, R.string.update_unavailable, Toast.LENGTH_LONG).show()
+                Updater.isNewer(this@SettingsActivity, u) -> Updater.offer(this@SettingsActivity, u)
+                else -> Toast.makeText(this@SettingsActivity,
+                    getString(R.string.update_latest, Updater.currentName(this@SettingsActivity)), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun chooseTheme() {

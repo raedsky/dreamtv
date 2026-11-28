@@ -97,6 +97,14 @@ class HomeActivity : BaseActivity() {
             }?.let { p -> app.repo.fetchExpiry(p)?.let { app.prefs.saveProfile(p.copy(expiry = it)) } }
             panelDevice = device
             refreshInfo()
+            // تحديث جديد للتطبيق؟ نعرضه مرة وحدة لكل نسخة
+            st.update?.let { u ->
+                val spu = getSharedPreferences("settings", MODE_PRIVATE)
+                if (Updater.isNewer(this@HomeActivity, u) && spu.getInt("upd_offered", 0) != u.code) {
+                    spu.edit().putInt("upd_offered", u.code).apply()
+                    Updater.offer(this@HomeActivity, u)
+                }
+            }
             // الثيم المختار من اللوحة (يُطبّق فقط عند تغييره في اللوحة)
             val sp = getSharedPreferences("settings", MODE_PRIVATE)
             val pt = st.theme

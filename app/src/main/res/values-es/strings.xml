@@ -140,8 +140,7 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="live_format_title">Formato en directo</string>
     <string name="players">Reproductores</string>
     <string name="sd_only_title">Solo calidad SD</string>
-    <string name="update_now">Actualizar ahora</string>
-    <string name="mac_address">Dirección MAC: %1$s</string>
+        <string name="mac_address">Dirección MAC: %1$s</string>
     <string name="tab_home_full">Inicio</string>
     <string name="fullscreen">Pantalla completa</string>
     <string name="search_btn">Buscar</string>
@@ -160,4 +159,18 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="stopped_at">Detenido en %1$s</string>
     <string name="stopped_at_of">Detenido en %1$s de %2$s</string>
     <string name="watched">Visto</string>
+    <string name="update_app">Actualizar app</string>
+    <string name="version_x">Versión %1$s</string>
+    <string name="update_checking">Buscando actualización…</string>
+    <string name="update_unavailable">No se pudo comprobar ahora</string>
+    <string name="update_latest">Tienes la última versión (%1$s)</string>
+    <string name="update_available">Nueva actualización</string>
+    <string name="update_available_msg">La versión %1$s está disponible (tienes %2$s). ¿Actualizar ahora?</string>
+    <string name="update_now_btn">Actualizar ahora</string>
+    <string name="later">Más tarde</string>
+    <string name="update_downloading">Descargando… %1$d%%</string>
+    <string name="update_failed">Error al actualizar: %1$s</string>
+    <string name="update_allow_install">Para instalar actualizaciones, permite una vez que esta app instale apps, luego vuelve y pulsa de nuevo.</string>
+    <string name="open_settings">Abrir ajustes</string>
+    <string name="update_now">Actualizar contenido</string>
 </resources>

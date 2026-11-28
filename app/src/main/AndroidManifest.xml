@@ -3,6 +3,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- تثبيت التحديثات من داخل التطبيق -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- يسمح بالتثبيت على الشاشات والبوكسات التي ليس فيها لمس -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -56,6 +58,16 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|navigation"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.MyTV.Player" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_paths" />
+        </provider>
+
         <!-- حفظ لغة التطبيق المختارة على أندرويد أقدم من 13 -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

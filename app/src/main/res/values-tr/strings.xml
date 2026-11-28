@@ -140,8 +140,7 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="live_format_title">Canlı yayın biçimi</string>
     <string name="players">Oynatıcılar</string>
     <string name="sd_only_title">Yalnızca SD kalite</string>
-    <string name="update_now">Şimdi güncelle</string>
-    <string name="mac_address">MAC adresi: %1$s</string>
+        <string name="mac_address">MAC adresi: %1$s</string>
     <string name="tab_home_full">Ana sayfa</string>
     <string name="fullscreen">Tam ekran</string>
     <string name="search_btn">Ara</string>
@@ -160,4 +159,18 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="stopped_at">%1$s noktasında kaldı</string>
     <string name="stopped_at_of">%2$s içinde %1$s noktasında kaldı</string>
     <string name="watched">İzlendi</string>
+    <string name="update_app">Uygulamayı güncelle</string>
+    <string name="version_x">Sürüm %1$s</string>
+    <string name="update_checking">Güncelleme aranıyor…</string>
+    <string name="update_unavailable">Şu anda güncelleme kontrol edilemedi</string>
+    <string name="update_latest">En son sürüm sizde (%1$s)</string>
+    <string name="update_available">Yeni güncelleme var</string>
+    <string name="update_available_msg">%1$s sürümü mevcut (sizde %2$s). Şimdi güncellensin mi?</string>
+    <string name="update_now_btn">Şimdi güncelle</string>
+    <string name="later">Sonra</string>
+    <string name="update_downloading">Güncelleme indiriliyor… %1$d%%</string>
+    <string name="update_failed">Güncelleme başarısız: %1$s</string>
+    <string name="update_allow_install">Güncellemeleri yüklemek için bu uygulamaya bir kez uygulama yükleme izni verin, sonra geri dönüp tekrar basın.</string>
+    <string name="open_settings">Ayarları aç</string>
+    <string name="update_now">İçeriği yenile</string>
 </resources>

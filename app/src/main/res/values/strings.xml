@@ -143,8 +143,7 @@
     <string name="live_format_title">Live stream format</string>
     <string name="players">Players</string>
     <string name="sd_only_title">SD quality only</string>
-    <string name="update_now">Update now</string>
-    <string name="mac_address">MAC address: %1$s</string>
+        <string name="mac_address">MAC address: %1$s</string>
     <string name="tab_home_full">Home</string>
     <string name="fullscreen">Full screen</string>
     <string name="search_btn">Search</string>
@@ -163,4 +162,18 @@
     <string name="stopped_at">Stopped at %1$s</string>
     <string name="stopped_at_of">Stopped at %1$s of %2$s</string>
     <string name="watched">Watched</string>
+    <string name="update_app">Update app</string>
+    <string name="version_x">Version %1$s</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_unavailable">Could not check for updates right now</string>
+    <string name="update_latest">You have the latest version (%1$s)</string>
+    <string name="update_available">New update available</string>
+    <string name="update_available_msg">Version %1$s is available (you have %2$s). Update now?</string>
+    <string name="update_now_btn">Update now</string>
+    <string name="later">Later</string>
+    <string name="update_downloading">Downloading update… %1$d%%</string>
+    <string name="update_failed">Update failed: %1$s</string>
+    <string name="update_allow_install">To install updates, allow this app to install apps once. Turn it on in the next screen, then come back and press Update again.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="update_now">Refresh content</string>
 </resources>

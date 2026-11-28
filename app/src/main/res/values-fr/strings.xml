@@ -140,8 +140,7 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="live_format_title">Format du direct</string>
     <string name="players">Lecteurs</string>
     <string name="sd_only_title">Qualité SD uniquement</string>
-    <string name="update_now">Mettre à jour</string>
-    <string name="mac_address">Adresse MAC : %1$s</string>
+        <string name="mac_address">Adresse MAC : %1$s</string>
     <string name="tab_home_full">Accueil</string>
     <string name="fullscreen">Plein écran</string>
     <string name="search_btn">Rechercher</string>
@@ -160,4 +159,18 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="stopped_at">Arrêté à %1$s</string>
     <string name="stopped_at_of">Arrêté à %1$s sur %2$s</string>
     <string name="watched">Vu</string>
+    <string name="update_app">Mettre à jour l\'app</string>
+    <string name="version_x">Version %1$s</string>
+    <string name="update_checking">Recherche de mise à jour…</string>
+    <string name="update_unavailable">Impossible de vérifier les mises à jour</string>
+    <string name="update_latest">Vous avez la dernière version (%1$s)</string>
+    <string name="update_available">Nouvelle mise à jour</string>
+    <string name="update_available_msg">La version %1$s est disponible (vous avez %2$s). Mettre à jour ?</string>
+    <string name="update_now_btn">Mettre à jour</string>
+    <string name="later">Plus tard</string>
+    <string name="update_downloading">Téléchargement… %1$d%%</string>
+    <string name="update_failed">Échec de la mise à jour : %1$s</string>
+    <string name="update_allow_install">Pour installer les mises à jour, autorisez cette app à installer des apps (une seule fois), puis revenez et appuyez à nouveau.</string>
+    <string name="open_settings">Ouvrir les paramètres</string>
+    <string name="update_now">Actualiser le contenu</string>
 </resources>
