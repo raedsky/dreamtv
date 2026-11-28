@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
  * شاشة القسم (مباشر / أفلام / مسلسلات): التصنيفات على الجانب والعناصر في الوسط.
  * نفس الشاشة تُستخدم للأقسام الثلاثة، لذلك ميزة "إضافة قروب" متوفرة في الجميع.
  */
-class BrowseActivity : AppCompatActivity() {
+class BrowseActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_TYPE = "type"

@@ -16,7 +16,7 @@ import com.mytv.player.data.Panel
 import kotlinx.coroutines.launch
 
 /** تظهر عندما يكون الجهاز غير مفعّل / موقوف / منتهي في لوحة التحكم. */
-class ActivationActivity : AppCompatActivity() {
+class ActivationActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_STATUS = "status"

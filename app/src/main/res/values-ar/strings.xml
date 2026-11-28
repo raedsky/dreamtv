@@ -155,4 +155,9 @@
     <string name="enjoy_streaming">استمتع بالمشاهدة!</string>
     <string name="device_status">مفعّل حتى</string>
     <string name="active_now">النشطة</string>
+    <string name="device_type">نوع الجهاز</string>
+    <string name="device_auto">تلقائي</string>
+    <string name="device_tv">شاشة / بوكس</string>
+    <string name="device_tablet">تابلت</string>
+    <string name="device_phone">جوال</string>
 </resources>

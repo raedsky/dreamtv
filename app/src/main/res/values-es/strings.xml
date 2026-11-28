@@ -152,4 +152,9 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="enjoy_streaming">¡Disfruta tu contenido!</string>
     <string name="device_status">Activo hasta</string>
     <string name="active_now">Activa</string>
+    <string name="device_type">Tipo de dispositivo</string>
+    <string name="device_auto">Automático</string>
+    <string name="device_tv">TV / Box</string>
+    <string name="device_tablet">Tableta</string>
+    <string name="device_phone">Teléfono</string>
 </resources>

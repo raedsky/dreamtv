@@ -28,7 +28,7 @@ import com.mytv.player.data.Themes
 import kotlinx.coroutines.launch
 
 /** شاشة الإعدادات: شبكة بطاقات مثل Dream TV، وتحتها MAC ومفتاح الجهاز. */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     companion object {
         const val RESULT_PLAYLISTS = Activity.RESULT_FIRST_USER + 1
@@ -76,6 +76,7 @@ class SettingsActivity : AppCompatActivity() {
             Option(R.drawable.ic_playlist_add, getString(R.string.add_playlist)) { LoginActivity.add(this) },
             Option(R.drawable.ic_translate, getString(R.string.language), { currentLanguageName() }) { chooseLanguage() },
             Option(R.drawable.ic_palette, getString(R.string.theme), { Themes.current.name }) { chooseTheme() },
+            Option(R.drawable.ic_tv_format, getString(R.string.device_type), { deviceModeName(DeviceMode.get(this)) }) { chooseDeviceMode() },
             Option(R.drawable.ic_eye_off, getString(R.string.hide_live)) { manageHidden(ContentType.LIVE, getString(R.string.live)) },
             Option(R.drawable.ic_eye_off, getString(R.string.hide_movies)) { manageHidden(ContentType.MOVIE, getString(R.string.movies)) },
             Option(R.drawable.ic_eye_off, getString(R.string.hide_series)) { manageHidden(ContentType.SERIES, getString(R.string.series)) },
@@ -140,6 +141,30 @@ class SettingsActivity : AppCompatActivity() {
                 prefs.playerMode = if (which == 1) Prefs.PLAYER_EXTERNAL else Prefs.PLAYER_INTERNAL
                 d.dismiss()
                 refresh()
+            }
+            .show()
+    }
+
+    private fun deviceModeName(m: String) = getString(when (m) {
+        DeviceMode.TV -> R.string.device_tv
+        DeviceMode.TABLET -> R.string.device_tablet
+        DeviceMode.PHONE -> R.string.device_phone
+        else -> R.string.device_auto
+    })
+
+    /** نوع الجهاز: يعيد تشغيل الواجهة بالمقاس المناسب */
+    private fun chooseDeviceMode() {
+        val modes = DeviceMode.all
+        AlertDialog.Builder(this)
+            .setTitle(R.string.device_type)
+            .setSingleChoiceItems(modes.map { deviceModeName(it) }.toTypedArray(),
+                modes.indexOf(DeviceMode.get(this)).coerceAtLeast(0)) { d, which ->
+                d.dismiss()
+                if (modes[which] == DeviceMode.get(this)) return@setSingleChoiceItems
+                DeviceMode.set(this, modes[which])
+                startActivity(Intent(this, HomeActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                finish()
             }
             .show()
     }

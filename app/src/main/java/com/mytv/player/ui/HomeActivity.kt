@@ -21,7 +21,7 @@ import java.text.DateFormat
 import java.util.Date
 
 /** الشاشة الرئيسية — أول شاشة تفتح في التطبيق. */
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     private val app get() = App.instance
 

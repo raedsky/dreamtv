@@ -23,7 +23,7 @@ import java.text.DateFormat
 import java.util.Date
 
 /** شاشة القوائم مثل Dream TV: بطاقات القوائم + "إضافة قائمة تشغيل"، وعلى اليمين الشعار و MAC. */
-class PlaylistsActivity : AppCompatActivity() {
+class PlaylistsActivity : BaseActivity() {
 
     companion object {
         fun open(ctx: Context) = ctx.startActivity(Intent(ctx, PlaylistsActivity::class.java))

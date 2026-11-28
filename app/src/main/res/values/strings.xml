@@ -155,4 +155,9 @@
     <string name="enjoy_streaming">Enjoy your streaming!</string>
     <string name="device_status">Active until</string>
     <string name="active_now">Active</string>
+    <string name="device_type">Device type</string>
+    <string name="device_auto">Automatic</string>
+    <string name="device_tv">TV / Box</string>
+    <string name="device_tablet">Tablet</string>
+    <string name="device_phone">Phone</string>
 </resources>

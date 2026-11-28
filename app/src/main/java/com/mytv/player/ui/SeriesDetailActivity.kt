@@ -22,7 +22,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /** صفحة المسلسل: أزرار المواسم + حلقات الموسم المختار. */
-class SeriesDetailActivity : AppCompatActivity() {
+class SeriesDetailActivity : BaseActivity() {
 
     companion object {
         private var pending: StreamItem? = null

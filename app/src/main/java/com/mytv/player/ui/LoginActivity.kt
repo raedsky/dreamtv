@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 /** إضافة قائمة تشغيل جديدة أو تعديل قائمة موجودة. */
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_ID = "id"

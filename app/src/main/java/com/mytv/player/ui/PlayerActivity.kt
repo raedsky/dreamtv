@@ -109,7 +109,7 @@ object PlayQueue {
 }
 
 @OptIn(UnstableApi::class)
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : BaseActivity() {
 
     companion object {
         fun start(ctx: Context) = ctx.startActivity(Intent(ctx, PlayerActivity::class.java))

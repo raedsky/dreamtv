@@ -152,4 +152,9 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="enjoy_streaming">İyi seyirler!</string>
     <string name="device_status">Bitiş</string>
     <string name="active_now">Etkin</string>
+    <string name="device_type">Cihaz türü</string>
+    <string name="device_auto">Otomatik</string>
+    <string name="device_tv">TV / Kutu</string>
+    <string name="device_tablet">Tablet</string>
+    <string name="device_phone">Telefon</string>
 </resources>

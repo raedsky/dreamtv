@@ -19,7 +19,7 @@ import com.mytv.player.data.StreamItem
 import kotlinx.coroutines.launch
 
 /** صفحة الفيلم مثل IBO: خلفية الفيلم، البوستر، التقييم، القصة، تشغيل / مفضلة / إعلان. */
-class MovieDetailActivity : AppCompatActivity() {
+class MovieDetailActivity : BaseActivity() {
 
     companion object {
         private var pending: StreamItem? = null
