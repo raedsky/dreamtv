@@ -26,6 +26,38 @@ class App : Application() {
         repo = Repository(prefs)
         watch = com.mytv.player.data.WatchStore(this)
         com.mytv.player.data.Themes.load(this)
+        startHeartbeat()
+    }
+
+    // ---------- نبضة "متصل" كل دقيقة ما دام التطبيق ظاهر ----------
+    private var started = 0
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val beat = object : Runnable {
+        override fun run() {
+            if (started > 0) com.mytv.player.data.Panel.ping(this@App)
+            handler.postDelayed(this, 60_000)
+        }
+    }
+
+    private fun startHeartbeat() {
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityStarted(a: android.app.Activity) {
+                if (started++ == 0) { handler.removeCallbacks(beat); handler.post(beat) }
+            }
+            override fun onActivityStopped(a: android.app.Activity) {
+                started = (started - 1).coerceAtLeast(0)
+                if (started == 0) {
+                    // التطبيق راح للخلفية: نبلغ اللوحة إنه توقف عن المشاهدة
+                    com.mytv.player.data.Panel.NowPlaying.clear()
+                    handler.removeCallbacks(beat)
+                }
+            }
+            override fun onActivityCreated(a: android.app.Activity, b: android.os.Bundle?) {}
+            override fun onActivityResumed(a: android.app.Activity) {}
+            override fun onActivityPaused(a: android.app.Activity) {}
+            override fun onActivitySaveInstanceState(a: android.app.Activity, b: android.os.Bundle) {}
+            override fun onActivityDestroyed(a: android.app.Activity) {}
+        })
     }
 
     companion object {

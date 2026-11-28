@@ -55,6 +55,32 @@ object Panel {
         }
     }
 
+    /** ماذا يشاهد الجهاز الآن (يُرسل للوحة مع النبضة) */
+    object NowPlaying {
+        @Volatile var title: String? = null
+        @Volatile var kind: String? = null   // live | movie | series
+        @Volatile private var owner: Any? = null
+        fun set(t: String?, k: String?, by: Any? = null) { title = t; kind = k; owner = by }
+        /** يمسح فقط إذا كانت الشاشة نفسها هي اللي سجّلت المشاهدة (أو بدون تحديد) */
+        fun clear(by: Any? = null) { if (by == null || by === owner) { title = null; kind = null; owner = null } }
+    }
+
+    /** نبضة "متصل" للوحة — بدون انتظار، تُستدعى كل دقيقة وعند بدء/إيقاف التشغيل. */
+    fun ping(ctx: Context) {
+        if (!PanelConfig.enabled) return
+        val (mac, key) = deviceIds(ctx)
+        fun e(s: String) = URLEncoder.encode(s, "UTF-8")
+        val url = PanelConfig.API_URL +
+            (if ('?' in PanelConfig.API_URL) "&" else "?") +
+            "act=ping&key=${e(PanelConfig.API_KEY)}&mac=${e(mac)}&dkey=${e(key)}" +
+            "&w=${e(NowPlaying.title.orEmpty())}&k=${e(NowPlaying.kind.orEmpty())}" +
+            (if (PanelConfig.RESELLER.isNotBlank()) "&r=${e(PanelConfig.RESELLER)}" else "")
+        App.http.newCall(Request.Builder().url(url).build()).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {}
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) { response.close() }
+        })
+    }
+
     /** يتصل باللوحة ويحفظ النتيجة. يرجع null إذا تعذّر الاتصال. */
     suspend fun sync(ctx: Context): PanelState? = withContext(Dispatchers.IO) {
         if (!PanelConfig.enabled) return@withContext null

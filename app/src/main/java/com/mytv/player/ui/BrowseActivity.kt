@@ -576,6 +576,8 @@ class BrowseActivity : AppCompatActivity() {
     }
 
     private fun startPreview(item: StreamItem) {
+        com.mytv.player.data.Panel.NowPlaying.set(item.name, "live", this)
+        com.mytv.player.data.Panel.ping(this)
         val url = item.url ?: return
         previewItem = item
         val p = previewPlayer ?: Players.create(this).also {
@@ -667,6 +669,7 @@ class BrowseActivity : AppCompatActivity() {
     }
 
     private fun stopPreview() {
+        com.mytv.player.data.Panel.NowPlaying.clear(this)
         previewPlayer?.release()
         previewPlayer = null
         if (::previewView.isInitialized) previewView.player = null

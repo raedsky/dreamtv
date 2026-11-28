@@ -75,6 +75,10 @@ object Playback {
                 .setDataAndType(android.net.Uri.parse(e.url), "video/*")
                 .putExtra("title", e.title)
             if (intent.resolveActivity(act.packageManager) != null) {
+                // نسجّل المشاهدة في اللوحة قبل الانتقال للمشغّل الخارجي
+                com.mytv.player.data.Panel.NowPlaying.set(e.title,
+                    if (live) "live" else if (e.seriesKey != null) "series" else "movie")
+                com.mytv.player.data.Panel.ping(act)
                 act.startActivity(Intent.createChooser(intent, e.title))
                 return
             }
@@ -180,6 +184,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        com.mytv.player.data.Panel.NowPlaying.clear(this)
         saveProgress()
         if (::tvTitle.isInitialized) tvTitle.removeCallbacks(saveTick)
         player?.release()
@@ -297,6 +302,9 @@ class PlayerActivity : AppCompatActivity() {
         p.prepare()
         p.playWhenReady = true
         showTitle(e.title)
+        com.mytv.player.data.Panel.NowPlaying.set(e.title,
+            if (PlayQueue.live) "live" else if (e.seriesKey != null) "series" else "movie", this)
+        com.mytv.player.data.Panel.ping(this)
         askResume(e, p)
         tvTitle.removeCallbacks(saveTick)
         if (!PlayQueue.live && e.key != null) tvTitle.postDelayed(saveTick, 10_000)

@@ -280,7 +280,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="autoSizeTextType">uniform</item>
-        <item name="autoSizeMinTextSize">9sp</item>
+        <item name="autoSizeMinTextSize">8sp</item>
         <item name="autoSizeMaxTextSize">14sp</item>
         <item name="autoSizeStepGranularity">1sp</item>
     </style>
