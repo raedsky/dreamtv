@@ -121,6 +121,17 @@ object ThemeUi {
         shape(ctx, 6f, 0xFF15151A.toInt(), 0x59FFFFFF, 1f)
     )
 
+    /** شريط تقدّم واضح: خلفية رمادية + الجزء المشاهد بلون الثيم */
+    fun progressBar(ctx: Context): Drawable {
+        val track = shape(ctx, 3f, 0x66FFFFFF)
+        val fill = android.graphics.drawable.ClipDrawable(shape(ctx, 3f, t.accent),
+            android.view.Gravity.START, android.graphics.drawable.ClipDrawable.HORIZONTAL)
+        return android.graphics.drawable.LayerDrawable(arrayOf(track, fill)).apply {
+            setId(0, android.R.id.background)
+            setId(1, android.R.id.progress)
+        }
+    }
+
     fun bg() = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(t.bg, t.bgEnd))
 
     /** يمر على كل الشاشة ويطبّق الثيم حسب android:tag */
@@ -150,7 +161,7 @@ object ThemeUi {
                     arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf()),
                     intArrayOf(t.accent, 0xD9FFFFFF.toInt())))
             }
-            "progress" -> (v as? ProgressBar)?.progressTintList = ColorStateList.valueOf(t.accent)
+            "progress" -> (v as? ProgressBar)?.progressDrawable = progressBar(ctx)
         }
         if (v is ViewGroup) for (i in 0 until v.childCount) apply(v.getChildAt(i))
     }

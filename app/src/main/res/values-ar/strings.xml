@@ -160,4 +160,7 @@
     <string name="device_tv">شاشة / بوكس</string>
     <string name="device_tablet">تابلت</string>
     <string name="device_phone">جوال</string>
+    <string name="stopped_at">توقفت عند %1$s</string>
+    <string name="stopped_at_of">توقفت عند %1$s من %2$s</string>
+    <string name="watched">تمت المشاهدة</string>
 </resources>

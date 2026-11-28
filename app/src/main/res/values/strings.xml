@@ -160,4 +160,7 @@
     <string name="device_tv">TV / Box</string>
     <string name="device_tablet">Tablet</string>
     <string name="device_phone">Phone</string>
+    <string name="stopped_at">Stopped at %1$s</string>
+    <string name="stopped_at_of">Stopped at %1$s of %2$s</string>
+    <string name="watched">Watched</string>
 </resources>

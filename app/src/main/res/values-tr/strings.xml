@@ -157,4 +157,7 @@ Tam ekran için tekrar OK\'a basın.</string>
     <string name="device_tv">TV / Kutu</string>
     <string name="device_tablet">Tablet</string>
     <string name="device_phone">Telefon</string>
+    <string name="stopped_at">%1$s noktasında kaldı</string>
+    <string name="stopped_at_of">%2$s içinde %1$s noktasında kaldı</string>
+    <string name="watched">İzlendi</string>
 </resources>

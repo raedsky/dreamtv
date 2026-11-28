@@ -212,7 +212,7 @@ class ItemAdapter(
             val w = com.mytv.player.App.instance.watch
             val prog = if (w.resumePosition(item.key) != null) w.get(item.key) else null
             pb.isVisible = prog != null && prog.duration > 0
-            if (prog != null) pb.progress = prog.percent
+            if (prog != null) pb.progress = prog.percent.coerceAtLeast(2)
         }
         Images.load(h.image, item.icon)
         h.itemView.setOnClickListener {
@@ -240,6 +240,7 @@ class EpisodeAdapter(
         val thumb: ImageView = v.findViewById(R.id.ivThumb)
         val watch: android.widget.ProgressBar = v.findViewById(R.id.pbWatch)
         val done: TextView = v.findViewById(R.id.tvWatched)
+        val resume: TextView = v.findViewById(R.id.tvResume)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -254,10 +255,21 @@ class EpisodeAdapter(
         Images.load(h.thumb, e.icon ?: fallbackImage())
         val w = com.mytv.player.App.instance.watch
         val key = com.mytv.player.data.WatchStore.episodeKey(e)
-        val prog = if (w.resumePosition(key) != null) w.get(key) else null
+        val resumeAt = w.resumePosition(key)
+        val prog = if (resumeAt != null) w.get(key) else null
         h.watch.isVisible = prog != null && prog.duration > 0
-        if (prog != null) h.watch.progress = prog.percent
+        if (prog != null) h.watch.progress = prog.percent.coerceAtLeast(2)
         h.done.isVisible = prog == null && w.isWatched(key)
+        // سطر "توقفت عند 23:10 من 45:00" قبل الدخول للحلقة
+        val ctx = h.itemView.context
+        h.resume.isVisible = resumeAt != null || w.isWatched(key)
+        h.resume.text = when {
+            resumeAt != null && prog != null && prog.duration > 0 -> "⏸  " + ctx.getString(R.string.stopped_at_of,
+                com.mytv.player.data.WatchStore.format(resumeAt), com.mytv.player.data.WatchStore.format(prog.duration)) +
+                "  •  ${prog.percent}%"
+            resumeAt != null -> "⏸  " + ctx.getString(R.string.stopped_at, com.mytv.player.data.WatchStore.format(resumeAt))
+            else -> "✓  " + ctx.getString(R.string.watched)
+        }
         h.itemView.setOnClickListener {
             val pos = h.bindingAdapterPosition
             if (pos != RecyclerView.NO_POSITION) onClick(pos)

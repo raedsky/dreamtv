@@ -157,4 +157,7 @@ Appuyez encore sur OK pour le plein écran.</string>
     <string name="device_tv">TV / Box</string>
     <string name="device_tablet">Tablette</string>
     <string name="device_phone">Téléphone</string>
+    <string name="stopped_at">Arrêté à %1$s</string>
+    <string name="stopped_at_of">Arrêté à %1$s sur %2$s</string>
+    <string name="watched">Vu</string>
 </resources>

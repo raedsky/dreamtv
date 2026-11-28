@@ -157,4 +157,7 @@ Pulsa OK otra vez para pantalla completa.</string>
     <string name="device_tv">TV / Box</string>
     <string name="device_tablet">Tableta</string>
     <string name="device_phone">Teléfono</string>
+    <string name="stopped_at">Detenido en %1$s</string>
+    <string name="stopped_at_of">Detenido en %1$s de %2$s</string>
+    <string name="watched">Visto</string>
 </resources>
